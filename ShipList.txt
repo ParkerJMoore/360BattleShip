@@ -1,0 +1,3 @@
+ship1.png
+ship2.png
+ship3.png
