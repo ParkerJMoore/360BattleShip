@@ -29,6 +29,8 @@ class DrawCanvas extends Canvas
     public DrawCanvas() throws IOException
     {
         boardBuffer = ImageIO.read(new File("boardImage.png"));
+
+        boardGraphics = boardBuffer.createGraphics();
         setSize(407, 333);
         bsp = new BattleShipPlacement();
         
@@ -46,12 +48,14 @@ class DrawCanvas extends Canvas
     @Override
     public void update(Graphics g)
     {
+        bsp.render(boardGraphics, med.getMouseX(), med.getMouseY());
         g.drawImage(boardBuffer, 0, 0, this);
     }
     
     @Override
     public void paint(Graphics g)
     {
+        bsp.render(boardGraphics, med.getMouseX(), med.getMouseY());
         g.drawImage(boardBuffer, 0, 0, this);
     }
 }

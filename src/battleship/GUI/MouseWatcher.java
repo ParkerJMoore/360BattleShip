@@ -37,6 +37,6 @@ public class MouseWatcher extends MouseAdapter {
 
     public void mouseMoved(MouseEvent e)
     {
-
+        med.updateCursor(e);
     }
 }

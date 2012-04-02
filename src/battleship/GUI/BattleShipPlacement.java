@@ -21,12 +21,13 @@ public class BattleShipPlacement implements Renderable {
     
     public BattleShipPlacement() throws IOException {
         currentShip = 0;
+        ships = new BufferedImage[5];
         readShips();
     }
     
     private void readShips() throws FileNotFoundException, IOException
     {
-        /*BufferedReader br = new BufferedReader(
+        BufferedReader br = new BufferedReader(
                 new FileReader(new File("ShipList.txt")));
         
         String s = br.readLine();
@@ -36,14 +37,14 @@ public class BattleShipPlacement implements Renderable {
         for(int i=0; i < 1; i++) {
             System.out.println(s);
             ships[0] = ImageIO.read(new File(s));
-        }*/
+            ships[0] = ships[0].getSubimage(20, 25, 110, 25);
+        }
     }
     
     public void nextShip()
     {
         currentShip++;
     }
-    
     
     @Override
     public void render(Graphics2D g, int x, int y) {
