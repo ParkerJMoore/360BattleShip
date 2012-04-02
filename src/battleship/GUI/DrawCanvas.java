@@ -20,7 +20,7 @@ class DrawCanvas extends Canvas
     private BufferedImage drawBuff;
     private Graphics2D drawGraphics;
     
-    private int width, height, gridSize;
+    private int totWidth, totHeight, indWidth, indHeight,gridSize;
     private String board1, board2;
     
     BattleShipPlacement bsp;
@@ -36,7 +36,7 @@ class DrawCanvas extends Canvas
         getSizes();
         initImages();
         
-        setSize(width, height);
+        setSize(totWidth, totHeight);
         bsp = new BattleShipPlacement();
         
         med = new DrawCanvasMouseMediator(this);
@@ -48,14 +48,14 @@ class DrawCanvas extends Canvas
     {
         //calculate the piece placement
         int x, y;
-        x = (med.getMouseX()/gridSize)*gridSize;
-        y = (med.getMouseY()/gridSize)*gridSize;
+        x = (med.getMouseX()/50)*50;
+        y = (med.getMouseY()/50)*50;
         if(bsp.shipsRemaining()) {
-            if(x < gridSize)
-                x = gridSize;
-            else if((x+(bsp.getCurrentShipSize()*gridSize)) > height)
-                x = height - (bsp.getCurrentShipSize()*gridSize);
-            if(y < height)
+            if(x < 50)
+                x = 50;
+            else if((x+(bsp.getCurrentShipSize()*50)) > 500)
+                x = 500 - (bsp.getCurrentShipSize()*50);
+            if(y < 50)
                 y = 50;
         }
         else {
@@ -105,19 +105,21 @@ class DrawCanvas extends Canvas
                 x = 500 - (bsp.getCurrentShipSize()*50);
             if(y < 50)
                 y = 50;
-
-            myBoard.placePiece(bsp.getPiece(), x, y);
+            
+            myBoard.placePiece(bsp.getPiece(), x/50, y/50);
             bsp.nextShip();
         }
         else {
-            if(x < 550)
-                x = 550;
+            if(x < 600)
+                x = 600;
             else if((x+(bsp.getCurrentShipSize()*50)) > 1050)
                 x = 1050 - (bsp.getCurrentShipSize()*50);
             if(y < 50)
                 y = 50;
             
-            if(myBoard.hit(x, y) == true)
+            System.out.println("x: " + (x-550)/50);
+            
+            if(myBoard.hit((x-550)/50, y/50) == true)
                 System.out.println("Hit!");
             else
                 System.out.println("Miss!");
@@ -127,13 +129,12 @@ class DrawCanvas extends Canvas
 
     private void getSizes() throws FileNotFoundException, IOException {
         Scanner scan = new Scanner(new File("settings.txt"));
-        
         board1 = scan.nextLine();
         board2 = scan.nextLine();
-        width = scan.nextInt();
-        height = scan.nextInt();
+        totWidth = scan.nextInt();
+        totHeight = scan.nextInt();
+        indWidth = scan.nextInt();
+        indHeight = scan.nextInt();
         gridSize = scan.nextInt();
     }
-    
-    
 }
