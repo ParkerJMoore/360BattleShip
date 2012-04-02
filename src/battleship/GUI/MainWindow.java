@@ -9,6 +9,8 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import javax.swing.JFrame;
 
 /**
@@ -19,10 +21,10 @@ public class MainWindow extends JFrame
 { 
     private DrawCanvas canvas;
     
-    public MainWindow(String title) throws IOException
+    public MainWindow(String title, ObjectOutputStream o, ObjectInputStream i, int c) throws IOException
     {
         super(title);
-        canvas = new DrawCanvas();
+        canvas = new DrawCanvas(o, i, c);
         formatComponents();
         this.setCursor(noCursor);
     }

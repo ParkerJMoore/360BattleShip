@@ -1,15 +1,14 @@
 package battleship.GUI;
 
 import battleship.Infrastructure.BattleShipPlacement;
+import battleship.Infrastructure.CommMsg;
 import battleship.Infrastructure.GameBoard;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.Scanner;
 import javax.imageio.ImageIO;
 
@@ -30,12 +29,22 @@ class DrawCanvas extends Canvas
     
     MouseWatcher mouse;
     DrawCanvasMouseMediator med;
+    
+    ObjectOutputStream out;
+    ObjectInputStream in;
+    int turn;
+    
+    CommMsg msg;
     //variables
     
-    
-    
-    public DrawCanvas() throws IOException
+    public DrawCanvas(ObjectOutputStream o, ObjectInputStream i, int c) throws IOException
     {
+        msg = new CommMsg();
+        
+        out = o;
+        in = i;
+        turn = c;
+        
         getSizes();
         initImages();
         
@@ -126,7 +135,6 @@ class DrawCanvas extends Canvas
             //will include whether or not an opponents ship was hit. If it was
             //It will draw something on the map(maybe a X?) to let the user know
             //they hit
-            
             if(myBoard.hit((x-550)/50, y/50) == true) {
                 System.out.println("Hit!");
                 oppBoard.placePiece(hitMarker, 0, (x-550)/50, y/50);
