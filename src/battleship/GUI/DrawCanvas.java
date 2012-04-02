@@ -38,18 +38,23 @@ class DrawCanvas extends Canvas
     @Override
     public void update(Graphics g)
     {
-        drawGraphics.clearRect(0, 0, 407, 333);
-        
-        board.render(drawGraphics, 0, 0);
+        //calculate the piece placement
         int x, y;
         x = (med.getMouseX()/50)*50;
         y = (med.getMouseY()/50)*50;
-        if((med.getMouseX()/50)*50 < 50)
+        if(x < 50)
             x = 50;
-        if((med.getMouseY()/50)*50 < 50)
+        else if((x+(bsp.getCurrentShipSize()*50)) > 500)
+            x = 500 - (bsp.getCurrentShipSize()*50);
+        if(y < 50)
             y = 50;
         
+        //draw everything to the buffer
+        drawGraphics.clearRect(0, 0, 407, 333);
+        board.render(drawGraphics, 0, 0);
         bsp.render(drawGraphics, x, y);
+
+        //draw the buffer
         paint(g);
     }
     
@@ -68,13 +73,29 @@ class DrawCanvas extends Canvas
     }
 
     public void reactToClick() {
+        
+        int x = (med.getMouseX()/50)*50;
+        int y = (med.getMouseY()/50)*50;
+        if(x < 50)
+            x = 50;
+        else if((x+(bsp.getCurrentShipSize()*50)) > 500)
+            x = 500 - (bsp.getCurrentShipSize()*50);
+        if(y < 50)
+            y = 50;
+        
         if(bsp.shipsRemaining()) {
-            board.placePiece(bsp.getPiece(), med.getMouseX(), med.getMouseY());
+            System.out.println("in if");
+            board.placePiece(bsp.getPiece(), x, y);
             bsp.nextShip();
         }
-        
-        else
-            System.out.println("No ships left");
+        else {
+            System.out.println("in else");
+            if(board.hit(x, y) == true)
+                System.out.println("Hit!");
+            else
+                System.out.println("Miss!");
+            
+        }
         
     }
     

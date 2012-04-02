@@ -6,6 +6,8 @@ package battleship.Infrastructure;
 
 import battleship.GUI.Renderable;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
 /**
@@ -30,6 +32,11 @@ public class Ship implements Renderable {
     public BufferedImage getImage()
     {
         return shipImage;
+    }
+    
+    public int getSize()
+    {
+        return size;
     }
     
     @Override

@@ -16,15 +16,14 @@ import javax.swing.JFrame;
  * @author Parker Moore, Sean Kelly
  */
 public class MainWindow extends JFrame
-{
-    
+{ 
     private DrawCanvas canvas;
     
     public MainWindow() throws IOException
     {
         canvas = new DrawCanvas();
         formatComponents();
-        //this.setCursor(noCursor);
+        this.setCursor(noCursor);
     }
     
     private final BufferedImage noCursorImg = 

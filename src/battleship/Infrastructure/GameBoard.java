@@ -34,10 +34,20 @@ public class GameBoard implements Renderable{
     
     public void placePiece(Ship s, int x, int y)
     {
-        board[x/50-1][y/50-1] = true;
+        for(int i=0; i<s.getSize(); i++)
+            board[(x/50-1)+i][(y/50-1)] = true;
         boardGraphics.drawImage(s.getImage(), (x/50)*50, (y/50)*50, null);
-    }
+    }    
     
+    public boolean hit(int x, int y)
+    {
+        boolean ret = false;
+        if(board[(x/50)-1][(y/50)-1]==true) {
+            board[(x/50)-1][(y/50)-1] = false;
+            ret = true;
+        }
+        return ret;
+    }
     
     @Override
     public void render(Graphics2D g, int x, int y) {
