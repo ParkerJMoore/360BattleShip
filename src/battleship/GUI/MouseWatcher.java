@@ -20,7 +20,7 @@ public class MouseWatcher extends MouseAdapter {
     @Override
     public void mousePressed(MouseEvent e)
     {
-        System.out.println(e.getX());
+        med.handleClick(e);
     }
 
     @Override

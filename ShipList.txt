@@ -1,1 +1,3 @@
-shipSprites.png 20 25 110 25
+2
+ship1.png 0 0 150 50 3
+ship2.png 0 0 100 50 2

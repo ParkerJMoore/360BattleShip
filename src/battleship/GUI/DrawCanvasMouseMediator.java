@@ -9,10 +9,12 @@ import java.awt.event.MouseEvent;
 public class DrawCanvasMouseMediator {
    
     private int currX, currY;
+    private DrawCanvas canvas;
     
-    public DrawCanvasMouseMediator()
+    public DrawCanvasMouseMediator(DrawCanvas c)
     {
         currX = currY = 0;
+        canvas = c;
     }
 
     public void updateCursor(MouseEvent e) {
@@ -28,5 +30,9 @@ public class DrawCanvasMouseMediator {
     public int getMouseY()
     {
         return currY;
+    }
+
+    void handleClick(MouseEvent e) {
+        canvas.reactToClick();
     }
 }
