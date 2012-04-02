@@ -21,14 +21,14 @@ public class GameBoard implements Renderable{
     private Graphics2D boardGraphics;
     private boolean[][] board;
     
-    public GameBoard() throws IOException
+    public GameBoard(String s) throws IOException
     {
         board = new boolean[10][10];
         for(int i=0; i<10; i++)
             for(int j=0; j<10; j++)
                 board[i][j] = false;
         
-        boardImage = ImageIO.read(new File("battleBoard.png"));
+        boardImage = ImageIO.read(new File(s));
         boardGraphics = boardImage.createGraphics();
     }
     

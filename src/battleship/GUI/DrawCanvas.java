@@ -7,14 +7,21 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Scanner;
 
 class DrawCanvas extends Canvas
 {
     //variables
-    GameBoard board;
+    private GameBoard myBoard;
+    private GameBoard oppBoard;
     private BufferedImage drawBuff;
     private Graphics2D drawGraphics;
+    
+    private int width, height, gridSize;
+    private String board1, board2;
     
     BattleShipPlacement bsp;
     
@@ -26,9 +33,10 @@ class DrawCanvas extends Canvas
     
     public DrawCanvas() throws IOException
     {
+        getSizes();
         initImages();
         
-        setSize(500, 500);
+        setSize(width, height);
         bsp = new BattleShipPlacement();
         
         med = new DrawCanvasMouseMediator(this);
@@ -40,18 +48,29 @@ class DrawCanvas extends Canvas
     {
         //calculate the piece placement
         int x, y;
-        x = (med.getMouseX()/50)*50;
-        y = (med.getMouseY()/50)*50;
-        if(x < 50)
-            x = 50;
-        else if((x+(bsp.getCurrentShipSize()*50)) > 500)
-            x = 500 - (bsp.getCurrentShipSize()*50);
-        if(y < 50)
-            y = 50;
+        x = (med.getMouseX()/gridSize)*gridSize;
+        y = (med.getMouseY()/gridSize)*gridSize;
+        if(bsp.shipsRemaining()) {
+            if(x < gridSize)
+                x = gridSize;
+            else if((x+(bsp.getCurrentShipSize()*gridSize)) > height)
+                x = height - (bsp.getCurrentShipSize()*gridSize);
+            if(y < height)
+                y = 50;
+        }
+        else {
+            if(x < 600)
+                x = 600;
+            else if((x+(bsp.getCurrentShipSize()*50)) > 1050)
+                x = 1050 - (bsp.getCurrentShipSize()*50);
+            if(y < 50)
+                y = 50;
+        }
         
         //draw everything to the buffer
         drawGraphics.clearRect(0, 0, 407, 333);
-        board.render(drawGraphics, 0, 0);
+        myBoard.render(drawGraphics, 0, 0);
+        oppBoard.render(drawGraphics, 550, 0);
         bsp.render(drawGraphics, x, y);
 
         //draw the buffer
@@ -66,8 +85,10 @@ class DrawCanvas extends Canvas
     
     private void initImages() throws IOException
     {
-        board = new GameBoard();
-        drawBuff = new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB);
+        myBoard = new GameBoard(board1);
+        oppBoard = new GameBoard(board2);
+        
+        drawBuff = new BufferedImage(1050, 500, BufferedImage.TYPE_INT_ARGB);
         drawGraphics = drawBuff.createGraphics();
         drawGraphics.setBackground(new Color(0, 0, 0, 0));        
     }
@@ -76,27 +97,42 @@ class DrawCanvas extends Canvas
         
         int x = (med.getMouseX()/50)*50;
         int y = (med.getMouseY()/50)*50;
-        if(x < 50)
-            x = 50;
-        else if((x+(bsp.getCurrentShipSize()*50)) > 500)
-            x = 500 - (bsp.getCurrentShipSize()*50);
-        if(y < 50)
-            y = 50;
         
         if(bsp.shipsRemaining()) {
-            System.out.println("in if");
-            board.placePiece(bsp.getPiece(), x, y);
+            if(x < 50)
+                x = 50;
+            else if((x+(bsp.getCurrentShipSize()*50)) > 500)
+                x = 500 - (bsp.getCurrentShipSize()*50);
+            if(y < 50)
+                y = 50;
+
+            myBoard.placePiece(bsp.getPiece(), x, y);
             bsp.nextShip();
         }
         else {
-            System.out.println("in else");
-            if(board.hit(x, y) == true)
+            if(x < 550)
+                x = 550;
+            else if((x+(bsp.getCurrentShipSize()*50)) > 1050)
+                x = 1050 - (bsp.getCurrentShipSize()*50);
+            if(y < 50)
+                y = 50;
+            
+            if(myBoard.hit(x, y) == true)
                 System.out.println("Hit!");
             else
                 System.out.println("Miss!");
-            
         }
         
+    }
+
+    private void getSizes() throws FileNotFoundException, IOException {
+        Scanner scan = new Scanner(new File("settings.txt"));
+        
+        board1 = scan.nextLine();
+        board2 = scan.nextLine();
+        width = scan.nextInt();
+        height = scan.nextInt();
+        gridSize = scan.nextInt();
     }
     
     
