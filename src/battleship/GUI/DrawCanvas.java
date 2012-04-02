@@ -11,12 +11,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
+import javax.imageio.ImageIO;
 
 class DrawCanvas extends Canvas
 {
     //variables
     private GameBoard myBoard;
     private GameBoard oppBoard;
+    
+    private BufferedImage hitMarker;
     private BufferedImage drawBuff;
     private Graphics2D drawGraphics;
     
@@ -88,6 +91,8 @@ class DrawCanvas extends Canvas
         myBoard = new GameBoard(board1);
         oppBoard = new GameBoard(board2);
         
+        hitMarker = ImageIO.read(new File("hitMarker.png"));
+        
         drawBuff = new BufferedImage(1050, 500, BufferedImage.TYPE_INT_ARGB);
         drawGraphics = drawBuff.createGraphics();
         drawGraphics.setBackground(new Color(0, 0, 0, 0));        
@@ -106,7 +111,7 @@ class DrawCanvas extends Canvas
             if(y < 50)
                 y = 50;
             
-            myBoard.placePiece(bsp.getPiece(), x/50, y/50);
+            myBoard.placePiece(bsp.getPiece().getImage(), bsp.getPiece().getSize(), x/50, y/50);
             bsp.nextShip();
         }
         else {
@@ -117,10 +122,15 @@ class DrawCanvas extends Canvas
             if(y < 50)
                 y = 50;
             
-            System.out.println("x: " + (x-550)/50);
+            //Here I will send a packet and wait for a response. A response
+            //will include whether or not an opponents ship was hit. If it was
+            //It will draw something on the map(maybe a X?) to let the user know
+            //they hit
             
-            if(myBoard.hit((x-550)/50, y/50) == true)
+            if(myBoard.hit((x-550)/50, y/50) == true) {
                 System.out.println("Hit!");
+                oppBoard.placePiece(hitMarker, 0, (x-550)/50, y/50);
+            }
             else
                 System.out.println("Miss!");
         }

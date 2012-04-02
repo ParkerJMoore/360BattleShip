@@ -32,11 +32,14 @@ public class GameBoard implements Renderable{
         boardGraphics = boardImage.createGraphics();
     }
     
-    public void placePiece(Ship s, int x, int y)
+    public void placePiece(BufferedImage b, int s, int x, int y)
     {
-        for(int i=0; i<s.getSize(); i++)
+        System.out.println("X: " + x);
+        System.out.println("Y: " + y);
+        
+        for(int i=0; i<s; i++)
             board[x-1+i][(y-1)] = true;
-        boardGraphics.drawImage(s.getImage(), x*50, y*50, null);
+        boardGraphics.drawImage(b, x*50, y*50, null);
     }    
     
     public boolean hit(int x, int y)
