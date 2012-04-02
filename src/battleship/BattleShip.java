@@ -7,6 +7,10 @@ package battleship;
 import battleship.GUI.MainWindow;
 import battleship.GUI.Painter;
 import java.io.IOException;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -19,7 +23,16 @@ public class BattleShip {
      */
     public static void main(String[] args) throws IOException {
 
-        MainWindow mw = new MainWindow();
+        BufferedImage icon;
+        try{
+        icon = ImageIO.read(new FileInputStream(new File("icon.PNG")));
+        }catch(Exception e){
+            icon = null;
+        }
+        MainWindow mw = new MainWindow("Super BattleBoats II");
+        mw.setIconImage(icon);
+        mw.setVisible(true);
+        
         
         Painter painter = new Painter(mw.getCanvas());
         painter.start();
