@@ -21,12 +21,12 @@ public class MainWindow extends JFrame
 { 
     private DrawCanvas canvas;
     
-    public MainWindow(String title) throws IOException
+    public MainWindow(String title, int i, ObjectInputStream l, ObjectOutputStream o) throws IOException
     {
         super(title);
-        canvas = new DrawCanvas();
+        canvas = new DrawCanvas(l, o, i);
         formatComponents();
-        this.setCursor(noCursor);
+        //this.setCursor(noCursor);
     }
     
     private final BufferedImage noCursorImg = 

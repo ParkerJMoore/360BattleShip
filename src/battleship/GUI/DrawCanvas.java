@@ -10,6 +10,8 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 class DrawCanvas extends Canvas
@@ -31,12 +33,22 @@ class DrawCanvas extends Canvas
     MouseWatcher mouse;
     DrawCanvasMouseMediator med;
     
+    boolean needToUpdate = false;
+    
     
     CommMsg msg;
+    
+    ObjectOutputStream out;
+    ObjectInputStream in;
+    int turn;
     //variables
     
-    public DrawCanvas() throws IOException
+    public DrawCanvas(ObjectInputStream i, ObjectOutputStream o, int ii) throws IOException
     {
+        in = i;
+        out = o;
+        turn = ii;
+        
         msg = new CommMsg();
         
         getSizes();
@@ -72,6 +84,17 @@ class DrawCanvas extends Canvas
             if(y < 50)
                 y = 50;
         }
+        
+        if(turn == 1 && !bsp.shipsRemaining())
+            waitForAndHandleMove();
+        
+        if(needToUpdate) {
+            needToUpdate = false;
+            turn = 1;
+        }
+            
+    
+    
         
         //draw everything to the buffer
         drawGraphics.clearRect(0, 0, 407, 333);
@@ -134,11 +157,26 @@ class DrawCanvas extends Canvas
             //It will draw something on the map(maybe a X?) to let the user know
             //they hit
             
-            if(myBoard.hit((x-550)/50, y/50) == true) {
-                oppBoard.placePiece(hitMarker, 0, (x-550)/50, y/50);
+            x = (x-550)/50;
+            y = y/50;
+            msg = new CommMsg(x, y);
+            out.writeObject(msg);
+            msg = (CommMsg) in.readObject();
+            
+            System.out.println("Sending the move: X "+x+ " Y " + y);
+            
+            //if(myBoard.hit((x-550)/50, y/50) == true) {
+            if(msg.hit == true) {
+                System.out.println("I hit them... better take note X");
+                oppBoard.placePiece(hitMarker, 0, x, y);
+                needToUpdate = true;
             }
-            else
-                oppBoard.placePiece(missMarker, 0, (x-550)/50, y/50);
+            else {
+                System.out.println("I missed them... better take note []");
+                oppBoard.placePiece(missMarker, 0, x, y);
+                needToUpdate = true;
+            }
+            
         }
     }
 
@@ -151,5 +189,40 @@ class DrawCanvas extends Canvas
         indWidth = scan.nextInt();
         indHeight = scan.nextInt();
         gridSize = scan.nextInt();
+    }
+    
+    private void waitForAndHandleMove() {
+        //recieve a message
+            try {
+                //the user is now waiting for the oppenents move to come through
+                   msg = (CommMsg) in.readObject();
+            } catch (IOException ex) {
+                Logger.getLogger(DrawCanvas.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(DrawCanvas.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        
+            
+            System.out.println("Recieved the move: X "+msg.x+ " Y " + msg.y);
+            //evaluate the message
+            if(myBoard.hit(msg.x, msg.y) == true) {
+                System.out.println("They hit. Printing X on myBoard");
+                myBoard.placePiece(hitMarker, 0, msg.x, msg.y);
+                msg.hit = true;
+            }
+            else {
+                System.out.println("They Missed. Printing [] on myBoard");
+                myBoard.placePiece(missMarker, 0, msg.x, msg.y);
+                msg.hit = false;
+            }
+            
+            //send the message
+            try {
+                out.writeObject(msg);
+            } catch (IOException ex) {
+                Logger.getLogger(DrawCanvas.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            turn = 0;
     }
 }

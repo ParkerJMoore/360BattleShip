@@ -21,5 +21,13 @@ public class CommMsg implements Serializable {
         x = y = 0;
     }
     
+    public CommMsg(int ix, int iy)
+    {
+        hit = false;
+        win = false;
+        x = ix;
+        y = iy;
+    }
+    
             
 }

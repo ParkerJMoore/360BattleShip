@@ -29,14 +29,14 @@ public class BattleShip {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 
         //get user input
-        /*
-        JFrame parent = new JFrame();
-        JOptionPane optionPane = new JOptionPane("Would you like to be the client?", 
-                JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION);
-        JDialog dialog = optionPane.createDialog(parent, "CHOOSE ONE!!!");
-        dialog.setVisible(true);
-    
-        int choice = (Integer)optionPane.getValue();
+        
+        
+        
+        String[] options = new String[] {"Client", "Server", "Cancel"};
+        int choice = JOptionPane.showOptionDialog(null, "Server or Client", "Please Choose One:",
+        JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
+        null, options, options[0]);
+        
         InetAddress servAddr = InetAddress.getLocalHost();
 
         Socket sock =  null;
@@ -51,8 +51,13 @@ public class BattleShip {
             sock = servSock.accept();
             System.out.println("Waiting for your opponent to connect.");
         }
-        else
-            sock =  new Socket(servAddr, 1234); 
+        else {
+            String input = JOptionPane.showInputDialog(null, "Please Enter IP of Opponent:", "Find Opponent",
+            JOptionPane.WARNING_MESSAGE);
+            System.out.println(input);
+            
+            sock =  new Socket(input, 1234); 
+        }
 
         out = new ObjectOutputStream(sock.getOutputStream());
         in = new ObjectInputStream(sock.getInputStream());
@@ -68,7 +73,7 @@ public class BattleShip {
             out.writeObject(msg);
             System.out.println("Success!");
         }
-        */
+        
 
         BufferedImage icon;
         try{
@@ -76,7 +81,7 @@ public class BattleShip {
         }catch(Exception e){
             icon = null;
         }
-        MainWindow mw = new MainWindow("Super BattleBoats II");
+        MainWindow mw = new MainWindow("Super BattleBoats II", choice, in, out);
         mw.setIconImage(icon);
         mw.setVisible(true);
         
