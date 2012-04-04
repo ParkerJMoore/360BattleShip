@@ -29,6 +29,7 @@ public class BattleShip {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 
         //get user input
+        /*
         JFrame parent = new JFrame();
         JOptionPane optionPane = new JOptionPane("Would you like to be the client?", 
                 JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION);
@@ -67,6 +68,7 @@ public class BattleShip {
             out.writeObject(msg);
             System.out.println("Success!");
         }
+        */
 
         BufferedImage icon;
         try{
@@ -74,7 +76,7 @@ public class BattleShip {
         }catch(Exception e){
             icon = null;
         }
-        MainWindow mw = new MainWindow("Super BattleBoats II", out, in, choice);
+        MainWindow mw = new MainWindow("Super BattleBoats II");
         mw.setIconImage(icon);
         mw.setVisible(true);
         

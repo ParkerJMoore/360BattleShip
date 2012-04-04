@@ -21,10 +21,10 @@ public class MainWindow extends JFrame
 { 
     private DrawCanvas canvas;
     
-    public MainWindow(String title, ObjectOutputStream o, ObjectInputStream i, int c) throws IOException
+    public MainWindow(String title) throws IOException
     {
         super(title);
-        canvas = new DrawCanvas(o, i, c);
+        canvas = new DrawCanvas();
         formatComponents();
         this.setCursor(noCursor);
     }

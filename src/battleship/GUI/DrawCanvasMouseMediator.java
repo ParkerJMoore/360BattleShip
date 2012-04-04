@@ -1,6 +1,7 @@
 package battleship.GUI;
 
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 
 /**
  *
@@ -32,7 +33,7 @@ public class DrawCanvasMouseMediator {
         return currY;
     }
 
-    void handleClick(MouseEvent e) {
+    void handleClick(MouseEvent e) throws IOException, ClassNotFoundException {
         canvas.reactToClick();
     }
 }

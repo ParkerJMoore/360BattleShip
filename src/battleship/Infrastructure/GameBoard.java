@@ -34,8 +34,7 @@ public class GameBoard implements Renderable{
     
     public void placePiece(BufferedImage b, int s, int x, int y)
     {
-        System.out.println("X: " + x);
-        System.out.println("Y: " + y);
+        
         
         for(int i=0; i<s; i++)
             board[x-1+i][(y-1)] = true;
