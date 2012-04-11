@@ -3,6 +3,7 @@ package battleship.GUI;
 import battleship.Infrastructure.BattleShipPlacement;
 import battleship.Infrastructure.CommMsg;
 import battleship.Infrastructure.GameBoard;
+import battleship.Infrastructure.NetworkMedium;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -36,7 +37,7 @@ class DrawCanvas extends Canvas
     boolean needToUpdate = false;
     
     
-    CommMsg msg;
+    NetworkMedium netMed;
     
     ObjectOutputStream out;
     ObjectInputStream in;
@@ -49,7 +50,7 @@ class DrawCanvas extends Canvas
         out = o;
         turn = ii;
         
-        msg = new CommMsg();
+        netMed = new NetworkMedium(new CommMsg(), out, in);
         
         getSizes();
         initImages();
@@ -65,25 +66,8 @@ class DrawCanvas extends Canvas
     public void update(Graphics g)
     {
         //calculate the piece placement
-        int x, y;
-        x = (med.getMouseX()/50)*50;
-        y = (med.getMouseY()/50)*50;
-        if(bsp.shipsRemaining()) {
-            if(x < 50)
-                x = 50;
-            else if((x+(bsp.getCurrentShipSize()*50)) > 500)
-                x = 500 - (bsp.getCurrentShipSize()*50);
-            if(y < 50)
-                y = 50;
-        }
-        else {
-            if(x < 600)
-                x = 600;
-            else if((x+(bsp.getCurrentShipSize()*50)) > 1050)
-                x = 1050 - (bsp.getCurrentShipSize()*50);
-            if(y < 50)
-                y = 50;
-        }
+        int x = calcX();
+        int y = calcY();
         
         if(turn == 1 && !bsp.shipsRemaining())
             waitForAndHandleMove();
@@ -93,9 +77,6 @@ class DrawCanvas extends Canvas
             turn = 1;
         }
             
-    
-    
-        
         //draw everything to the buffer
         drawGraphics.clearRect(0, 0, 407, 333);
         myBoard.render(drawGraphics, 0, 0);
@@ -127,57 +108,33 @@ class DrawCanvas extends Canvas
 
     public void reactToClick() throws IOException, ClassNotFoundException {
         
-        int x = (med.getMouseX()/50)*50;
-        int y = (med.getMouseY()/50)*50;
+        int x = calcX()/50;
+        int y = calcY()/50;
+        System.out.println("Calculated X to be: " + x);
+        System.out.println("Calculated y to be: " + y);
         
         //This is just for placing the initial ships
         if(bsp.shipsRemaining()) {
-            if(x < 50)
-                x = 50;
-            else if((x+(bsp.getCurrentShipSize()*50)) > 500)
-                x = 500 - (bsp.getCurrentShipSize()*50);
-            if(y < 50)
-                y = 50;
-            
-            myBoard.placePiece(bsp.getPiece().getImage(), bsp.getPiece().getSize(), x/50, y/50);
+            myBoard.placePiece(bsp.getPiece().getImage(), bsp.getPiece().getSize(), x, y);
             bsp.nextShip();
         }
         
-        //This is the main case
         else {
-            if(x < 600)
-                x = 600;
-            else if((x+(bsp.getCurrentShipSize()*50)) > 1050)
-                x = 1050 - (bsp.getCurrentShipSize()*50);
-            if(y < 50)
-                y = 50;
-            
-            //Here I will send a packet and wait for a response. A response
-            //will include whether or not an opponents ship was hit. If it was
-            //It will draw something on the map(maybe a X?) to let the user know
-            //they hit
-            
-            x = (x-550)/50;
-            y = y/50;
-            msg = new CommMsg(x, y);
-            out.writeObject(msg);
-            msg = (CommMsg) in.readObject();
-            
-            System.out.println("Sending the move: X "+x+ " Y " + y);
-            
-            //if(myBoard.hit((x-550)/50, y/50) == true) {
-            if(msg.hit == true) {
-                System.out.println("I hit them... better take note X");
+            x = x-11;
+            netMed.setMove(x, y);
+            netMed.send();
+            netMed.recieve();
+
+            if(netMed.hit() == true) {
                 oppBoard.placePiece(hitMarker, 0, x, y);
                 needToUpdate = true;
             }
             else {
-                System.out.println("I missed them... better take note []");
                 oppBoard.placePiece(missMarker, 0, x, y);
                 needToUpdate = true;
             }
-            
         }
+
     }
 
     private void getSizes() throws FileNotFoundException, IOException {
@@ -193,36 +150,53 @@ class DrawCanvas extends Canvas
     
     private void waitForAndHandleMove() {
         //recieve a message
-            try {
-                //the user is now waiting for the oppenents move to come through
-                   msg = (CommMsg) in.readObject();
-            } catch (IOException ex) {
-                Logger.getLogger(DrawCanvas.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(DrawCanvas.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        netMed.recieve();
+
+        //evaluate the message
+        if(myBoard.hit(netMed.getMoveX(), netMed.getMoveY()) == true) {
+            myBoard.placePiece(hitMarker, 0, netMed.getMoveX(), netMed.getMoveY());
+            netMed.setHit(true);
+        }
+        else {
+            myBoard.placePiece(missMarker, 0, netMed.getMoveX(), netMed.getMoveY());
+            netMed.setHit(false);
+        }
+
+        //send the message
+        netMed.send();
         
-            
-            System.out.println("Recieved the move: X "+msg.x+ " Y " + msg.y);
-            //evaluate the message
-            if(myBoard.hit(msg.x, msg.y) == true) {
-                System.out.println("They hit. Printing X on myBoard");
-                myBoard.placePiece(hitMarker, 0, msg.x, msg.y);
-                msg.hit = true;
-            }
-            else {
-                System.out.println("They Missed. Printing [] on myBoard");
-                myBoard.placePiece(missMarker, 0, msg.x, msg.y);
-                msg.hit = false;
-            }
-            
-            //send the message
-            try {
-                out.writeObject(msg);
-            } catch (IOException ex) {
-                Logger.getLogger(DrawCanvas.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            turn = 0;
+        //change the turn.
+        turn = 0;
+    }
+    
+    public int calcX()
+    {
+        int x;
+        x = (med.getMouseX()/50)*50;
+        
+        if(bsp.shipsRemaining()) {
+            if(x < 50)
+                x = 50;
+            else if((x+(bsp.getCurrentShipSize()*50)) > 500)
+                x = 500 - (bsp.getCurrentShipSize()*50);
+        }
+        else {
+            if(x < 600)
+                x = 600;
+            else if((x+(bsp.getCurrentShipSize()*50)) > 1050)
+                x = 1050 - (bsp.getCurrentShipSize()*50);
+        }
+        
+        return x;
+    }
+    
+    public int calcY()
+    {
+        int y = (med.getMouseY()/50)*50;
+        
+        if(y<50)
+            y = 50;
+        
+        return y;
     }
 }
