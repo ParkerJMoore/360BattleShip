@@ -12,6 +12,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -28,64 +29,80 @@ public class BattleShip {
      */
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 
-        //get user input
-        
-        
-        
-        String[] options = new String[] {"Client", "Server", "Cancel"};
-        int choice = JOptionPane.showOptionDialog(null, "Server or Client", "Please Choose One:",
-        JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
-        null, options, options[0]);
-        
-        InetAddress servAddr = InetAddress.getLocalHost();
-
-        Socket sock =  null;
-        ServerSocket servSock = null;
+        //get user input and connect to opponent
         ObjectOutputStream out = null;
         ObjectInputStream in = null;
-        
-        
-        if(choice == 1)
-        {//they chose server
-            servSock = new ServerSocket(1234);
-            sock = servSock.accept();
-            System.out.println("Waiting for your opponent to connect.");
-        }
-        else {
-            String input = JOptionPane.showInputDialog(null, "Please Enter IP of Opponent:", "Find Opponent",
-            JOptionPane.WARNING_MESSAGE);
-            System.out.println(input);
-            
-            sock =  new Socket(input, 1234); 
-        }
+        int choice = connectToOpponent(in, out);
 
-        out = new ObjectOutputStream(sock.getOutputStream());
-        in = new ObjectInputStream(sock.getInputStream());
-        
-        CommMsg msg = null;
-        
-        if(choice == 1) {
-            msg = (CommMsg) in.readObject();
-        }
-        else {
-            System.out.println("Connecting to selected opponent");
-            msg = new CommMsg();
-            out.writeObject(msg);
-            System.out.println("Success!");
-        }
-        
-
+        //set up the icon for the games window
         BufferedImage icon;
         try{
         icon = ImageIO.read(new FileInputStream(new File("icon.PNG")));
         }catch(Exception e){
             icon = null;
         }
+        
+        //start up the window
         MainWindow mw = new MainWindow("Super BattleBoats II", choice, in, out);
         mw.setIconImage(icon);
         mw.setVisible(true);
         
         Painter painter = new Painter(mw.getCanvas());
         painter.start();
+    }
+    
+    
+    
+    private static int connectToOpponent(ObjectInputStream in, ObjectOutputStream out) 
+            throws UnknownHostException, IOException, ClassNotFoundException
+    {
+        
+        //Get the users input
+        String[] options = new String[] {"Join", "Create", "Cancel"};
+        int choice = JOptionPane.showOptionDialog(null, 
+                "Join or Create a session", "Please Choose One:",
+        JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
+        null, options, options[0]);
+        
+        
+        //Creat the socket from the given information
+        Socket sock =  null;
+        ServerSocket servSock = null;
+        if(choice == 1)
+        {//they chose server
+            servSock = new ServerSocket(1234);
+            System.out.println("Waiting for your opponent to connect.");
+            sock = servSock.accept();
+        }
+        else if (choice == 0){
+            String input = JOptionPane.showInputDialog(null, 
+                    "Please Enter IP of desired Opponent:", "Find Opponent",
+            JOptionPane.WARNING_MESSAGE);
+            System.out.println("Attemption to connect to " + input);
+            
+            sock =  new Socket(input, 1234); 
+            System.out.println("Success! Beginning game.");
+        }
+        else
+            System.exit(1);
+        
+        
+        //Set up the input and output streams
+        out = new ObjectOutputStream(sock.getOutputStream());
+        in = new ObjectInputStream(sock.getInputStream());
+        
+
+        //Make sure the connection was successfull
+        CommMsg msg = null;
+        if(choice == 1) {
+            msg = (CommMsg) in.readObject();
+        }
+        else {
+            System.out.println("Connecting to challenger");
+            msg = new CommMsg();
+            out.writeObject(msg);
+            System.out.println("Success!");
+        }
+        return choice;
     }
 }
