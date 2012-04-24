@@ -25,6 +25,7 @@ public class NetworkMedium {
         msg = m;
         out = o;
         in = i;
+        
     }
     
     public NetworkMedium()

@@ -11,8 +11,6 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 class DrawCanvas extends Canvas
@@ -110,8 +108,6 @@ class DrawCanvas extends Canvas
         
         int x = calcX()/50;
         int y = calcY()/50;
-        System.out.println("Calculated X to be: " + x);
-        System.out.println("Calculated y to be: " + y);
         
         //This is just for placing the initial ships
         if(bsp.shipsRemaining()) {
