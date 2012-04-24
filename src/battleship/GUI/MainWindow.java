@@ -11,7 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import javax.swing.JFrame;
+import javax.swing.*;
 
 /**
  *
@@ -19,14 +19,25 @@ import javax.swing.JFrame;
  */
 public class MainWindow extends JFrame
 { 
-    private DrawCanvas canvas;
+    public DrawCanvas canvas;
+    private MainWindowListener mwl;
+    public  ObjectInputStream in;
+    public  ObjectOutputStream out;
+    public  int choice;
     
-    public MainWindow(String title, int i, ObjectInputStream l, ObjectOutputStream o) throws IOException
+    public MainWindow(String title) throws IOException
     {
         super(title);
-        canvas = new DrawCanvas(l, o, i);
+
+        //add the listener for the menu buttons
+        mwl = new MainWindowListener(this);
+        
+        //create a menu bar and add a listener
+        createMenuItems();
+        
+        //add the canvas
+        canvas = new DrawCanvas(mwl);
         formatComponents();
-        //this.setCursor(noCursor);
     }
     
     private final BufferedImage noCursorImg = 
@@ -62,5 +73,27 @@ public class MainWindow extends JFrame
     public Canvas getCanvas()
     {
         return canvas;
+    }
+
+    private void createMenuItems() {
+        JMenuBar menuBar = new JMenuBar();
+        setJMenuBar(menuBar);
+        
+        JMenu fileMenu = new JMenu("Match");
+        menuBar.add(fileMenu);
+        
+        JMenuItem clientAction = new JMenuItem("Join");
+        JMenuItem serverAction = new JMenuItem("Create");
+        
+        fileMenu.add(clientAction);
+        fileMenu.add(serverAction);
+        
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(clientAction);
+        bg.add(serverAction);
+        
+        //add the listener for the buttons
+        clientAction.addActionListener(mwl);
+        serverAction.addActionListener(mwl);
     }
 }

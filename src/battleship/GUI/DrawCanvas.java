@@ -12,6 +12,10 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Scanner;
 import javax.imageio.ImageIO;
+import javax.swing.ButtonGroup;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 
 class DrawCanvas extends Canvas
 {
@@ -23,8 +27,12 @@ class DrawCanvas extends Canvas
     private BufferedImage missMarker;
     private BufferedImage drawBuff;
     private Graphics2D drawGraphics;
+
     
-    private int totWidth, totHeight, indWidth, indHeight,gridSize;
+    private int indWidth;
+    private int indHeight;
+    private int gridSize;
+    private int totWidth, totHeight;
     private String board1, board2;
     
     BattleShipPlacement bsp;
@@ -40,14 +48,14 @@ class DrawCanvas extends Canvas
     ObjectOutputStream out;
     ObjectInputStream in;
     int turn;
+    
+    MainWindowListener mwl;
     //variables
     
-    public DrawCanvas(ObjectInputStream i, ObjectOutputStream o, int ii) throws IOException
+    public DrawCanvas(MainWindowListener m) throws IOException
     {
-        in = i;
-        out = o;
-        turn = ii;
-        
+        mwl = m;
+
         netMed = new NetworkMedium(new CommMsg(), out, in);
         
         getSizes();
@@ -194,5 +202,14 @@ class DrawCanvas extends Canvas
             y = 50;
         
         return y;
+    }
+    
+    public void setStreams(ObjectInputStream i, ObjectOutputStream o, int ii)
+    {
+        in = i;
+        out = o;
+        turn = ii;
+        
+        netMed = new NetworkMedium(new CommMsg(), out, in);
     }
 }
