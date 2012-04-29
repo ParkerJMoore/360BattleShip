@@ -28,7 +28,9 @@ public class MainWindow extends JFrame
     public MainWindow(String title) throws IOException
     {
         super(title);
-
+        
+        choice = -1;
+        
         //add the listener for the menu buttons
         mwl = new MainWindowListener(this);
         

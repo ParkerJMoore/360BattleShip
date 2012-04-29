@@ -12,10 +12,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Scanner;
 import javax.imageio.ImageIO;
-import javax.swing.ButtonGroup;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 class DrawCanvas extends Canvas
 {
@@ -54,6 +51,7 @@ class DrawCanvas extends Canvas
     
     public DrawCanvas(MainWindowListener m) throws IOException
     {
+        turn = -1;
         mwl = m;
 
         netMed = new NetworkMedium(new CommMsg(), out, in);
@@ -113,29 +111,34 @@ class DrawCanvas extends Canvas
     }
 
     public void reactToClick() throws IOException, ClassNotFoundException {
-        
-        int x = calcX()/50;
-        int y = calcY()/50;
-        
-        //This is just for placing the initial ships
-        if(bsp.shipsRemaining()) {
-            myBoard.placePiece(bsp.getPiece().getImage(), bsp.getPiece().getSize(), x, y);
-            bsp.nextShip();
-        }
-        
+        if(turn == -1)
+            JOptionPane.showMessageDialog(null, "Please select Join/Select from"
+                    + " the Match menu before making a move.");
         else {
-            x = x-11;
-            netMed.setMove(x, y);
-            netMed.send();
-            netMed.recieve();
+            int x = calcX()/50;
+            int y = calcY()/50;
 
-            if(netMed.hit() == true) {
-                oppBoard.placePiece(hitMarker, 0, x, y);
-                needToUpdate = true;
+            //This is just for placing the initial ships
+            if(bsp.shipsRemaining()) {
+                myBoard.placePiece(bsp.getPiece().getImage(), bsp.getPiece().getSize(), x, y);
+                bsp.nextShip();
             }
+
             else {
-                oppBoard.placePiece(missMarker, 0, x, y);
-                needToUpdate = true;
+                //offsetting the calculation
+                x = x-11;
+                netMed.setMove(x, y);
+                netMed.send();
+                netMed.recieve();
+
+                if(netMed.hit() == true) {
+                    oppBoard.placePiece(hitMarker, 0, x, y);
+                    needToUpdate = true;
+                }
+                else {
+                    oppBoard.placePiece(missMarker, 0, x, y);
+                    needToUpdate = true;
+                }
             }
         }
 
