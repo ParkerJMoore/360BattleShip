@@ -63,8 +63,8 @@ class DrawCanvas extends Canvas
     
      private void initImages() throws IOException
     {
-        myBoard = new GameBoard("board.PNG");
-        oppBoard = new GameBoard("board.PNG");
+        myBoard = new GameBoard("board.png");
+        oppBoard = new GameBoard("board.png");
         
         hitMarker = ImageIO.read(new File("hitMarker.png"));
         missMarker = ImageIO.read(new File("missMarker.png"));
@@ -77,7 +77,7 @@ class DrawCanvas extends Canvas
         drawGraphics.setBackground(new Color(0, 0, 0, 0));
         drawGraphics.setFont(new Font("serif", Font.BOLD, 15));
         
-        boardBuff = ImageIO.read(new File("battleBoard.PNG"));
+        boardBuff = ImageIO.read(new File("battleBoard.png"));
         boardGraphics = boardBuff.createGraphics();
     }
      
