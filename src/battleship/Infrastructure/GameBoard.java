@@ -37,15 +37,15 @@ public class GameBoard implements Renderable{
         
         
         for(int i=0; i<s; i++)
-            board[x-1+i][(y-1)] = true;
-        boardGraphics.drawImage(b, x*50, y*50, null);
+            board[x+i][(y)] = true;
+        boardGraphics.drawImage(b, x*30, y*30, null);
     }    
     
     public boolean hit(int x, int y)
     {
         boolean ret = false;
-        if(board[x-1][y-1]==true) {
-            board[x-1][y-1] = false;
+        if(board[x][y]==true) {
+            board[x][y] = false;
             ret = true;
         }
         return ret;

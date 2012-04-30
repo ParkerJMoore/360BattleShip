@@ -4,10 +4,7 @@ import battleship.Infrastructure.BattleShipPlacement;
 import battleship.Infrastructure.CommMsg;
 import battleship.Infrastructure.GameBoard;
 import battleship.Infrastructure.NetworkMedium;
-import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Scanner;
@@ -16,6 +13,7 @@ import javax.swing.JOptionPane;
 
 class DrawCanvas extends Canvas
 {
+    /***************INITIALIZATIONS*************/
     //variables
     private GameBoard myBoard;
     private GameBoard oppBoard;
@@ -23,15 +21,11 @@ class DrawCanvas extends Canvas
     private BufferedImage hitMarker;
     private BufferedImage missMarker;
     private BufferedImage drawBuff;
+    private BufferedImage menuBuff;
+    private BufferedImage boardBuff;
+    private Graphics2D boardGraphics;
     private Graphics2D drawGraphics;
 
-    
-    private int indWidth;
-    private int indHeight;
-    private int gridSize;
-    private int totWidth, totHeight;
-    private String board1, board2;
-    
     BattleShipPlacement bsp;
     
     MouseWatcher mouse;
@@ -47,8 +41,10 @@ class DrawCanvas extends Canvas
     int turn;
     
     MainWindowListener mwl;
-    //variables
+    /***************INITIALIZATIONS*************/
     
+    
+    /**************CONSTRUCTOR AND DEPENDENCIES************/
     public DrawCanvas(MainWindowListener m) throws IOException
     {
         turn = -1;
@@ -56,20 +52,82 @@ class DrawCanvas extends Canvas
 
         netMed = new NetworkMedium(new CommMsg(), out, in);
         
-        getSizes();
         initImages();
         
-        setSize(totWidth, totHeight);
+        setSize(1000, 500);
         bsp = new BattleShipPlacement();
         
         med = new DrawCanvasMouseMediator(this);
         mouse = new MouseWatcher(this, med);
     }
     
+     private void initImages() throws IOException
+    {
+        myBoard = new GameBoard("board.PNG");
+        oppBoard = new GameBoard("board.PNG");
+        
+        hitMarker = ImageIO.read(new File("hitMarker.png"));
+        missMarker = ImageIO.read(new File("missMarker.png"));
+        
+        
+        drawBuff = new BufferedImage(1050, 500, BufferedImage.TYPE_INT_ARGB);
+        drawGraphics = drawBuff.createGraphics();
+        
+        drawGraphics.setColor(Color.BLACK);
+        drawGraphics.setBackground(new Color(0, 0, 0, 0));
+        drawGraphics.setFont(new Font("serif", Font.BOLD, 15));
+        
+        boardBuff = ImageIO.read(new File("battleBoard.PNG"));
+        boardGraphics = boardBuff.createGraphics();
+    }
+     
+     //should really only ever be called once.
+     public void setStreams(ObjectInputStream i, ObjectOutputStream o, int ii)
+    {
+        in = i;
+        out = o;
+        turn = ii;
+        
+        netMed = new NetworkMedium(new CommMsg(), out, in);
+    }
+    /***************END CONSTRUCTOR AND DEPENDENCIES*************/
+     
+    
+     
+    /****************DRAWING AND PAINTING**************************/ 
     @Override
     public void update(Graphics g)
     {
-        //calculate the piece placement
+        //Clear the screen
+        drawGraphics.clearRect(0, 0, 1000, 500);
+        drawGraphics.drawImage(boardBuff, 0, 0, null);
+        /*
+        //Draw appropriate images
+        if(turn == -1)
+            menuState();
+        else
+        */
+        gameState();
+
+        //paint them to the screen
+        paint(g);
+    }
+    
+    @Override
+    public void paint(Graphics g)
+    {
+        g.drawImage(drawBuff, 0, 0, this);
+    }
+    
+     public void menuState()
+    {
+        //draw all the menu stuff that we want
+        drawGraphics.drawString("Please Select a turn", 500, 200);
+    }
+    
+    public void gameState()
+    {
+         //calculate the piece placement
         int x = calcX();
         int y = calcY();
         
@@ -82,42 +140,40 @@ class DrawCanvas extends Canvas
         }
             
         //draw everything to the buffer
-        drawGraphics.clearRect(0, 0, 407, 333);
-        myBoard.render(drawGraphics, 0, 0);
-        oppBoard.render(drawGraphics, 550, 0);
+        myBoard.render(drawGraphics, 150, 50);
+        oppBoard.render(drawGraphics, 550, 50);
         bsp.render(drawGraphics, x, y);
-
-        //draw the buffer
-        paint(g);
+    }
+    /****************END DRAWING AND PAINTING**************************/
+    
+   
+    /*********************INTERPRETING INPUT AND NETWORK INTERACTION**********/
+    public void menuClick()
+    {
+        int x = calcX()/30;
+        int y = calcY()/30;
+            
+        System.out.println("Menu: The position is X: " + (x-4) + "Y: " + y);
+        //if(x < /*upper bound*/ && x > /*lowerbound*/ && y < /*.....*/)
+        /*
+        boolean createClicked;
+        boolean joinClicked;
+        
+        if(createClicked)
+            //do server setup
+        else if(joinClicked)
+            //do client setup
+        */  
     }
     
-    @Override
-    public void paint(Graphics g)
-    {
-        g.drawImage(drawBuff, 0, 0, this);
-    }
-    
-    private void initImages() throws IOException
-    {
-        myBoard = new GameBoard(board1);
-        oppBoard = new GameBoard(board2);
-        
-        hitMarker = ImageIO.read(new File("hitMarker.png"));
-        missMarker = ImageIO.read(new File("missMarker.png"));
-        
-        drawBuff = new BufferedImage(1050, 500, BufferedImage.TYPE_INT_ARGB);
-        drawGraphics = drawBuff.createGraphics();
-        drawGraphics.setBackground(new Color(0, 0, 0, 0));        
-    }
-
     public void reactToClick() throws IOException, ClassNotFoundException {
         if(turn == -1)
             JOptionPane.showMessageDialog(null, "Please select Join/Select from"
                     + " the Match menu before making a move.");
         else {
-            int x = calcX()/50;
-            int y = calcY()/50;
-
+            int x = (calcX()/30)-5;
+            int y = (calcY()/30)-1;
+            
             //This is just for placing the initial ships
             if(bsp.shipsRemaining()) {
                 myBoard.placePiece(bsp.getPiece().getImage(), bsp.getPiece().getSize(), x, y);
@@ -126,7 +182,8 @@ class DrawCanvas extends Canvas
 
             else {
                 //offsetting the calculation
-                x = x-11;
+                x = x-13;
+                System.out.println("Sending X: " + x + " Y: " + y);
                 netMed.setMove(x, y);
                 netMed.send();
                 netMed.recieve();
@@ -143,17 +200,7 @@ class DrawCanvas extends Canvas
         }
 
     }
-
-    private void getSizes() throws FileNotFoundException, IOException {
-        Scanner scan = new Scanner(new File("settings.txt"));
-        board1 = scan.nextLine();
-        board2 = scan.nextLine();
-        totWidth = scan.nextInt();
-        totHeight = scan.nextInt();
-        indWidth = scan.nextInt();
-        indHeight = scan.nextInt();
-        gridSize = scan.nextInt();
-    }
+    
     
     private void waitForAndHandleMove() {
         //recieve a message
@@ -175,44 +222,48 @@ class DrawCanvas extends Canvas
         //change the turn.
         turn = 0;
     }
+    /*********************END INTERPRETING INPUT AND NETWORK INTERACTION*****/
     
+    
+    /********************HELPER METHODS********************************/
     public int calcX()
     {
         int x;
-        x = (med.getMouseX()/50)*50;
+        x = (med.getMouseX()/30)*30;
         
         if(bsp.shipsRemaining()) {
-            if(x < 50)
-                x = 50;
-            else if((x+(bsp.getCurrentShipSize()*50)) > 500)
-                x = 500 - (bsp.getCurrentShipSize()*50);
+            if(x < 150)
+                x = 150;
+            else if((x+(bsp.getCurrentShipSize()*30)) > 450)
+                x = 450 - (bsp.getCurrentShipSize()*30);
         }
         else {
-            if(x < 600)
-                x = 600;
-            else if((x+(bsp.getCurrentShipSize()*50)) > 1050)
-                x = 1050 - (bsp.getCurrentShipSize()*50);
+            if(x < 550)
+                x = 550;
+            else if((x+(bsp.getCurrentShipSize()*30)) > 850)
+                x = 850 - (bsp.getCurrentShipSize()*30);
+            
+            //to compensate for it being 30 by 30
+            if(x != 550 || x != 850 - (bsp.getCurrentShipSize()*30)) {
+                while((x-550) %30 != 0) {
+                    x++;
+                }
+            }
         }
-        
         return x;
     }
     
     public int calcY()
     {
-        int y = (med.getMouseY()/50)*50;
+        int y = (med.getMouseY()/30)*30;
         
-        if(y<50)
-            y = 50;
+        if(y < 50)
+            y = 60;
+        else if(y > 350)
+            y = 330;
         
-        return y;
+        return y-10;
     }
-    
-    public void setStreams(ObjectInputStream i, ObjectOutputStream o, int ii)
-    {
-        in = i;
-        out = o;
-        turn = ii;
-        
-        netMed = new NetworkMedium(new CommMsg(), out, in);
-    }
+    /********************END HELPER METHODS********************************/
+   
 }

@@ -34,6 +34,9 @@ public class DrawCanvasMouseMediator {
     }
 
     void handleClick(MouseEvent e) throws IOException, ClassNotFoundException {
-        canvas.reactToClick();
+        //if(canvas.turn != -1)
+            canvas.reactToClick();
+        //else
+            //canvas.menuClick();
     }
 }
