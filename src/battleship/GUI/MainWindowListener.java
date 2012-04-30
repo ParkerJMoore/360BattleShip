@@ -155,7 +155,6 @@ public class MainWindowListener implements ActionListener {
     {
         gui = g;
     }
-
     
     public void closeGUI() throws FileNotFoundException, IOException
     {
