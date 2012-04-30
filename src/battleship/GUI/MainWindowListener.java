@@ -65,6 +65,7 @@ public class MainWindowListener implements ActionListener {
         
         try {
             servSock = new ServerSocket(1234);
+            System.out.println();
         } catch (IOException ex) {
             Logger.getLogger(MainWindowListener.class.getName()).log(Level.SEVERE, null, ex);
         }
