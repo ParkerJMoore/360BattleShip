@@ -7,6 +7,7 @@ package battleship.GUI;
 import battleship.Infrastructure.CommMsg;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -16,6 +17,7 @@ import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.JFrame;
 
 /**
  *
@@ -25,6 +27,7 @@ public class MainWindowListener implements ActionListener {
 
 
     MainWindow mw;
+    JFrame gui;
     int choice;
     
     
@@ -38,8 +41,18 @@ public class MainWindowListener implements ActionListener {
         
         if(ae.getActionCommand().equals("Join"))
             setUpClient();
-        else
+        else if(ae.getActionCommand().equals("Host"))
             setUpServer();
+        else if(ae.getActionCommand().equals("Exit")){
+            try
+            {
+              closeGUI();
+            }
+            catch (Exception e)
+            {
+              mw.dispose();
+            }
+        }
     }
     
     private void setUpServer()
@@ -136,5 +149,17 @@ public class MainWindowListener implements ActionListener {
     public int getChoice()
     {
         return mw.choice;
+    }
+    
+    public void registerGUI(JFrame g)
+    {
+        gui = g;
+    }
+
+    
+    public void closeGUI() throws FileNotFoundException, IOException
+    {
+        // Shutdown
+        gui.dispose();
     }
 }

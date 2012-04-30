@@ -32,18 +32,6 @@ public class MouseWatcher extends MouseAdapter {
         }
     }
 
-    @Override
-    public void mouseDragged(MouseEvent e)
-    {
-    
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e)
-    {
-    
-    }
-
     public void mouseMoved(MouseEvent e)
     {
         med.updateCursor(e);

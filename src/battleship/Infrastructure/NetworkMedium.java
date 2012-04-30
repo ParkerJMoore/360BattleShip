@@ -76,4 +76,14 @@ public class NetworkMedium {
             Logger.getLogger(NetworkMedium.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public void setWin(boolean b)
+    {
+        msg.setWin(b);
+    }
+    
+    public boolean win()
+    {
+        return msg.win();
+    }
 }

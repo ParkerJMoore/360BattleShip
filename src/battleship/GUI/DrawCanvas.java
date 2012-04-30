@@ -7,7 +7,6 @@ import battleship.Infrastructure.NetworkMedium;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.Scanner;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
@@ -63,22 +62,29 @@ class DrawCanvas extends Canvas
     
      private void initImages() throws IOException
     {
-        myBoard = new GameBoard("board.PNG");
-        oppBoard = new GameBoard("board.PNG");
+        //create the boards for game play
+        myBoard = new GameBoard("board.png");
+        oppBoard = new GameBoard("board.png");
         
+        //hit and miss markers for game play
         hitMarker = ImageIO.read(new File("hitMarker.png"));
         missMarker = ImageIO.read(new File("missMarker.png"));
         
-        
+        //the buffer that everything will be drawn to
         drawBuff = new BufferedImage(1050, 500, BufferedImage.TYPE_INT_ARGB);
         drawGraphics = drawBuff.createGraphics();
         
+        //setting up the draw graphics for drawing and writing
         drawGraphics.setColor(Color.BLACK);
         drawGraphics.setBackground(new Color(0, 0, 0, 0));
         drawGraphics.setFont(new Font("serif", Font.BOLD, 15));
         
-        boardBuff = ImageIO.read(new File("battleBoard.PNG"));
+        //the background image
+        boardBuff = ImageIO.read(new File("battleBoard.png"));
         boardGraphics = boardBuff.createGraphics();
+        
+        //the menu that will be used at the beginning
+        menuBuff = ImageIO.read(new File("titlescreen.png"));
     }
      
      //should really only ever be called once.
@@ -100,14 +106,12 @@ class DrawCanvas extends Canvas
     {
         //Clear the screen
         drawGraphics.clearRect(0, 0, 1000, 500);
-        drawGraphics.drawImage(boardBuff, 0, 0, null);
-        /*
+        
         //Draw appropriate images
         if(turn == -1)
             menuState();
         else
-        */
-        gameState();
+            gameState();
 
         //paint them to the screen
         paint(g);
@@ -122,7 +126,7 @@ class DrawCanvas extends Canvas
      public void menuState()
     {
         //draw all the menu stuff that we want
-        drawGraphics.drawString("Please Select a turn", 500, 200);
+        drawGraphics.drawImage(menuBuff, 0, 0, null);
     }
     
     public void gameState()
@@ -140,6 +144,7 @@ class DrawCanvas extends Canvas
         }
             
         //draw everything to the buffer
+        drawGraphics.drawImage(boardBuff, 0, 0, null);
         myBoard.render(drawGraphics, 150, 50);
         oppBoard.render(drawGraphics, 550, 50);
         bsp.render(drawGraphics, x, y);
@@ -148,24 +153,6 @@ class DrawCanvas extends Canvas
     
    
     /*********************INTERPRETING INPUT AND NETWORK INTERACTION**********/
-    public void menuClick()
-    {
-        int x = calcX()/30;
-        int y = calcY()/30;
-            
-        System.out.println("Menu: The position is X: " + (x-4) + "Y: " + y);
-        //if(x < /*upper bound*/ && x > /*lowerbound*/ && y < /*.....*/)
-        /*
-        boolean createClicked;
-        boolean joinClicked;
-        
-        if(createClicked)
-            //do server setup
-        else if(joinClicked)
-            //do client setup
-        */  
-    }
-    
     public void reactToClick() throws IOException, ClassNotFoundException {
         if(turn == -1)
             JOptionPane.showMessageDialog(null, "Please select Join/Select from"
@@ -210,6 +197,7 @@ class DrawCanvas extends Canvas
         if(myBoard.hit(netMed.getMoveX(), netMed.getMoveY()) == true) {
             myBoard.placePiece(hitMarker, 0, netMed.getMoveX(), netMed.getMoveY());
             netMed.setHit(true);
+            //netMed.
         }
         else {
             myBoard.placePiece(missMarker, 0, netMed.getMoveX(), netMed.getMoveY());
@@ -245,7 +233,7 @@ class DrawCanvas extends Canvas
             
             //to compensate for it being 30 by 30
             if(x != 550 || x != 850 - (bsp.getCurrentShipSize()*30)) {
-                while((x-550) %30 != 0) {
+                while((x-550) % 30 != 0) {
                     x++;
                 }
             }

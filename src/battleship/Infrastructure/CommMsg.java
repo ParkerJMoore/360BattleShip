@@ -80,4 +80,14 @@ public class CommMsg implements Serializable {
     {
         return hit;
     }
+    
+    public void setWin(boolean t)
+    {
+        win = t;
+    }
+    
+    public boolean win()
+    {
+        return win;
+    }
 }

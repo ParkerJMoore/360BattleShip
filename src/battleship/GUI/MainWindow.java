@@ -7,6 +7,7 @@ package battleship.GUI;
 import java.awt.Canvas;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -78,24 +79,59 @@ public class MainWindow extends JFrame
     }
 
     private void createMenuItems() {
-        JMenuBar menuBar = new JMenuBar();
-        setJMenuBar(menuBar);
+        JMenuBar menu = new JMenuBar();
+        setJMenuBar(menu);
         
-        JMenu fileMenu = new JMenu("Match");
-        menuBar.add(fileMenu);
+        JMenu file = new JMenu("File");
+        menu.add(file);
+        
+        JMenuItem exit = new JMenuItem("Exit");
+        file.add(exit);
+        
+        
+        JMenu game = new JMenu("Game");
+        menu.add(game);
         
         JMenuItem clientAction = new JMenuItem("Join");
-        JMenuItem serverAction = new JMenuItem("Create");
+        JMenuItem serverAction = new JMenuItem("Host");
         
-        fileMenu.add(clientAction);
-        fileMenu.add(serverAction);
+        game.add(clientAction);
+        game.add(serverAction);
+        
         
         ButtonGroup bg = new ButtonGroup();
         bg.add(clientAction);
         bg.add(serverAction);
+        bg.add(exit);
         
         //add the listener for the buttons
         clientAction.addActionListener(mwl);
         serverAction.addActionListener(mwl);
+        exit.addActionListener(mwl);
     }
+    /*
+    public class ExitItem extends JMenuItem implements Command
+    {
+        MainWindowMediator med;
+        ExitItem(ActionListener al, MainWindowMediator med)
+        {
+            super("Exit");
+            addActionListener(al);
+            this.med = med;
+        }
+        
+        @Override
+        public void execute()
+        {
+            try
+            {
+              med.closeGUI();
+            }
+            catch (Exception e)
+            {
+              dispose();
+            }
+        }
+    }*/
+    
 }

@@ -26,7 +26,7 @@ public class BattleShip {
         //set up the icon for the games window
         BufferedImage icon;
         try{
-        icon = ImageIO.read(new FileInputStream(new File("icon.PNG")));
+        icon = ImageIO.read(new FileInputStream(new File("icon.png")));
         }catch(Exception e){
             icon = null;
         }

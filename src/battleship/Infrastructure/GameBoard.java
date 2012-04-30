@@ -51,6 +51,19 @@ public class GameBoard implements Renderable{
         return ret;
     }
     
+    public boolean gameOver()
+    {
+        boolean ret = true;
+        for(int i=0; i<10; i++) {
+            for(int j=0; j<10; j++) {
+                if(board[i][j] == true) {
+                    ret = false;
+                }
+            }
+        }
+        return ret;
+    }
+    
     @Override
     public void render(Graphics2D g, int x, int y) {
         g.drawImage(boardImage, x, y, null);
