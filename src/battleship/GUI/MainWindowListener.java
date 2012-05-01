@@ -67,6 +67,7 @@ public class MainWindowListener implements ActionListener {
         CommMsg msg = null;
 
         mw.choice = 1;
+        choice = 1;
         
         try {
             servSock = new ServerSocket(1234);
@@ -108,6 +109,7 @@ public class MainWindowListener implements ActionListener {
         Socket sock = null;
         CommMsg msg = null;
         mw.choice = 0;
+        choice = 0;
         
         String input = JOptionPane.showInputDialog(null, 
                 "Please Enter IP of desired Opponent:", "Find Opponent",

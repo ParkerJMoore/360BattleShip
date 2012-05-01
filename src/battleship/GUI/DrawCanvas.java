@@ -6,13 +6,15 @@ import battleship.Infrastructure.GameBoard;
 import battleship.Infrastructure.NetworkMedium;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import javax.swing.JOptionPane;
 
 class DrawCanvas extends Canvas
 {
@@ -36,13 +38,16 @@ class DrawCanvas extends Canvas
     private BufferedImage boardBuff;
     private Graphics2D boardGraphics;
 
+    private BufferedImage player1Buff;
+    private BufferedImage player2Buff;
+    
     BattleShipPlacement bsp;
     
     MouseWatcher mouse;
     DrawCanvasMouseMediator med;
     
     boolean needToUpdate = false;
-    
+    boolean updateTimer = false;
     
     NetworkMedium netMed;
     
@@ -51,6 +56,8 @@ class DrawCanvas extends Canvas
     int turn;
     
     InetAddress ownIP;
+    int time;
+    int timeLeft;
     
     MainWindowListener mwl;
     /***************INITIALIZATIONS*************/
@@ -59,7 +66,8 @@ class DrawCanvas extends Canvas
     /**************CONSTRUCTOR AND DEPENDENCIES************/
     public DrawCanvas(MainWindowListener m) throws IOException
     {
-        
+        time = 0;
+        timeLeft = 50;
         //Get the hosts IP address
         try {
             ownIP = InetAddress.getLocalHost();
@@ -117,6 +125,9 @@ class DrawCanvas extends Canvas
         menuGraphics.setColor(Color.YELLOW);
         menuGraphics.setBackground(new Color(0, 0, 0, 0));
         menuGraphics.setFont(new Font("serif", Font.BOLD, 15));
+        
+        player1Buff = ImageIO.read(new File("euanpic.png"));
+        player2Buff = ImageIO.read(new File("zanepic.png"));
     }
      
      //should really only ever be called once.
@@ -184,19 +195,63 @@ class DrawCanvas extends Canvas
         oppBoard.render(drawGraphics, 550, 50);
         bsp.render(drawGraphics, x, y);
         
-        //drawing your ship information
-        drawGraphics.drawImage(bsp.getShipImage(0), 5, 55, null);
-        drawGraphics.drawString(Integer.toString(myBoard.shipsLeft(0)), 100, 75);
+        if(mwl.choice == 1) {
+            drawGraphics.drawImage(player1Buff, 0, 350, null);
+            drawGraphics.drawImage(player2Buff, 850, 350, null);
+        }
+        else {
+            drawGraphics.drawImage(player2Buff, 0, 350, null);
+            drawGraphics.drawImage(player1Buff, 850, 359, null);
+        }
         
-        drawGraphics.drawImage(bsp.getShipImage(1), 5, 95, null);
-        drawGraphics.drawString(Integer.toString(myBoard.shipsLeft(1)), 100, 115);
+        
+        //drawing your ship information
+        drawGraphics.drawImage(bsp.getShipImage(0), 30, 55, null);
+        drawGraphics.drawString(Integer.toString(myBoard.shipsLeft(0)), 72, 100);
+        
+        drawGraphics.drawImage(bsp.getShipImage(1), 45, 115, null);
+        drawGraphics.drawString(Integer.toString(myBoard.shipsLeft(1)), 72, 160);
+        
+        drawGraphics.drawImage(bsp.getShipImage(2), 30, 175, null);
+        drawGraphics.drawString(Integer.toString(myBoard.shipsLeft(2)), 72, 220);
+        
+        drawGraphics.drawImage(bsp.getShipImage(3), 15, 235, null);
+        drawGraphics.drawString(Integer.toString(myBoard.shipsLeft(3)), 72, 280);
+        
+        drawGraphics.drawImage(bsp.getShipImage(4), 2, 295, null);
+        drawGraphics.drawString(Integer.toString(myBoard.shipsLeft(4)), 72, 340);
+        
         
         //drawing enemy ship information
-        drawGraphics.drawImage(bsp.getShipImage(0), 850, 55, null);
-        drawGraphics.drawString(Integer.toString(oppBoard.shipsLeft(0)), 955, 75);
+        drawGraphics.drawImage(bsp.getShipImage(0), 880, 55, null);
+        if(oppBoard.shipsLeft(0) > 0)
+            drawGraphics.drawString("Afloat", 900, 100);
+        else
+            drawGraphics.drawString("Sunk", 905, 100);
         
-        drawGraphics.drawImage(bsp.getShipImage(1), 850, 95, null);
-        drawGraphics.drawString(Integer.toString(oppBoard.shipsLeft(1)), 955, 115);
+        drawGraphics.drawImage(bsp.getShipImage(1), 895, 115, null);
+        if(oppBoard.shipsLeft(1) > 0)
+            drawGraphics.drawString("Afloat", 900, 160);
+        else
+            drawGraphics.drawString("Sunk", 905, 160);
+        
+        drawGraphics.drawImage(bsp.getShipImage(2), 880, 175, null);
+        if(oppBoard.shipsLeft(2) > 0)
+            drawGraphics.drawString("Afloat", 900, 220);
+        else
+            drawGraphics.drawString("Sunk", 905, 220);
+        
+        drawGraphics.drawImage(bsp.getShipImage(3), 865, 235, null);
+        if(oppBoard.shipsLeft(3) > 0)
+            drawGraphics.drawString("Afloat",900, 280);
+        else
+            drawGraphics.drawString("Sunk",905, 280);
+        
+        drawGraphics.drawImage(bsp.getShipImage(4), 852, 295, null);
+        if(oppBoard.shipsLeft(4) > 0)
+            drawGraphics.drawString("Afloat", 900, 340);
+        else
+            drawGraphics.drawString("Sunk", 900, 340);
         
         //write the appropriate status
         if(bsp.shipsRemaining() && turn == 0)
@@ -208,12 +263,25 @@ class DrawCanvas extends Canvas
             drawGraphics.drawString("wait for opponent to make their first move."
                     , 349, 465);
         }
-        else if(turn == 0)
-            drawGraphics.drawString("Please make a move."
-                    , 416, 450);
-        else
+        else if(turn == 0) {
+            if(updateTimer) {
+                timeLeft--;
+                updateTimer = false;
+                time = 0;
+            }
+            if(timeLeft < 0)
+                timeLeft = 0;
+            if(timeLeft == 0)
+                endGameOnTimeout();
+            drawGraphics.drawString("Time left to make a move: " + 
+                    Integer.toString(timeLeft), 380, 470);
+        }
+        else {
             drawGraphics.drawString("Waiting for opponent to make their move."
                     , 330, 450);
+            drawGraphics.drawString("Please allow your opponent 50 seconds to "
+                    + "make a move", 300, 465);
+        }
     }
     
     public void endState()
@@ -262,6 +330,9 @@ class DrawCanvas extends Canvas
                 }
             }
         }
+        timeLeft = 50;
+        time = 0;
+        updateTimer = false;
     }
     
     
@@ -269,31 +340,37 @@ class DrawCanvas extends Canvas
         //recieve a message
         netMed.recieve();
 
-        //evaluate the message
-        int k = myBoard.hit(netMed.getMoveX(), netMed.getMoveY());
-        if(k != 0) {
-            myBoard.placePiece(hitMarker, 0, 0, netMed.getMoveX(), netMed.getMoveY());
-            netMed.setHit(true);
-            netMed.setMove(0,0,k);
-            System.out.println(netMed.getID());
-            
-            if(myBoard.gameOver()) {
-                netMed.setWin(true);
-                turn = -3;
-            }
-            else 
-                turn = 0;
+        if(netMed.win() == true) {
+            turn = -2;
+            endState();
         }
         else {
-            myBoard.placePiece(missMarker, 0, 0, netMed.getMoveX(), netMed.getMoveY());
-            netMed.setHit(false);
-            netMed.setWin(false);
-            netMed.setMove(0,0,0);
-            turn = 0;
-        }
+            //evaluate the message
+            int k = myBoard.hit(netMed.getMoveX(), netMed.getMoveY());
+            if(k != 0) {
+                myBoard.placePiece(hitMarker, 0, 0, netMed.getMoveX(), netMed.getMoveY());
+                netMed.setHit(true);
+                netMed.setMove(0,0,k);
+                System.out.println(netMed.getID());
 
-        //send the message
-        netMed.send();
+                if(myBoard.gameOver()) {
+                    netMed.setWin(true);
+                    turn = -3;
+                }
+                else 
+                    turn = 0;
+            }
+            else {
+                myBoard.placePiece(missMarker, 0, 0, netMed.getMoveX(), netMed.getMoveY());
+                netMed.setHit(false);
+                netMed.setWin(false);
+                netMed.setMove(0,0,0);
+                turn = 0;
+            }
+
+            //send the message
+            netMed.send();
+        }
     }
     /*********************END INTERPRETING INPUT AND NETWORK INTERACTION*****/
     
@@ -338,5 +415,19 @@ class DrawCanvas extends Canvas
         return y-10;
     }
     /********************END HELPER METHODS********************************/
-   
+    
+    public void incTime(int t)
+    {
+        time += t;
+        if(time >= 1000)
+            updateTimer = true;
+            
+    }
+
+    private void endGameOnTimeout() {
+        netMed.setMove(-1,-1,0);
+        netMed.setWin(true);
+        netMed.send();
+        turn = -3;
+    }
 }

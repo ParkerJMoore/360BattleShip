@@ -29,6 +29,9 @@ public class GameBoard implements Renderable{
         shipsLeft = new int[5];
         shipsLeft[0] = 3;
         shipsLeft[1] = 2;
+        shipsLeft[2] = 3;
+        shipsLeft[3] = 4;
+        shipsLeft[4] = 5;
         placed = 0;
         
         board = new int[10][10];
@@ -59,12 +62,6 @@ public class GameBoard implements Renderable{
             JOptionPane.showMessageDialog(null, "Boats are not allowed to overlap.");
             return false;
         }
-        /*
-        if(s > 1) {
-            shipsLeft[placed] += s;
-            placed++;
-        }
-        */
     }    
     
     public int hit(int x, int y)

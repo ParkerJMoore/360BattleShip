@@ -23,7 +23,7 @@ public class BattleShipPlacement implements Renderable {
     
     public BattleShipPlacement() throws IOException {
         currentShip = 0;
-        ships = new Ship[5];
+        ships = new Ship[6];
         readShips();
     }
     

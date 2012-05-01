@@ -36,7 +36,7 @@ public class BattleShip {
         mw.setIconImage(icon);
         mw.setVisible(true);
         
-        Painter painter = new Painter(mw.getCanvas());
+        Painter painter = new Painter(mw.getCanvas(), mw.canvas);
         painter.start();
     }
 }

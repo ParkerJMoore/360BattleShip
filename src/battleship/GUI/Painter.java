@@ -9,9 +9,11 @@ import java.awt.Canvas;
 public class Painter extends Thread
 {
     private Canvas canvas;
-    public Painter(Canvas toUpdate)
+    private DrawCanvas can;
+    public Painter(Canvas toUpdate, DrawCanvas c)
     {
         canvas = toUpdate;
+        can = c;
     }
     
     public void run()
@@ -21,9 +23,10 @@ public class Painter extends Thread
         } catch (InterruptedException ex) {}
         while(true)
         {
+            can.incTime(10);
             canvas.repaint();
             try {
-                sleep(15);
+                sleep(10);
             } 
             catch (InterruptedException ex) {
                 break;
