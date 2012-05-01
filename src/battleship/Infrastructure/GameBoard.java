@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -39,11 +40,25 @@ public class GameBoard implements Renderable{
         boardGraphics = boardImage.createGraphics();
     }
     
-    public void placePiece(BufferedImage b, int s, int id, int x, int y)
+    public boolean placePiece(BufferedImage b, int s, int id, int x, int y)
     {
-        for(int i=0; i<s; i++)
-            board[x+i][(y)] = id;
-        boardGraphics.drawImage(b, x*30, y*30, null);
+        boolean placePiece = true;
+        for(int i=0; i<s; i++) {
+            if(board[x+i][y] != 0) {
+                placePiece = false;
+            }
+        }
+        
+        if(placePiece == true) {
+            for(int i=0; i<s; i++)
+                board[x+i][(y)] = id;
+            boardGraphics.drawImage(b, x*30, y*30, null);
+            return true;
+        }
+        else {
+            JOptionPane.showMessageDialog(null, "Boats are not allowed to overlap.");
+            return false;
+        }
         /*
         if(s > 1) {
             shipsLeft[placed] += s;

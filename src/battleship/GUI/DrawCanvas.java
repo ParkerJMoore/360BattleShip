@@ -237,9 +237,9 @@ class DrawCanvas extends Canvas
             
             //This is just for placing the initial ships
             if(bsp.shipsRemaining()) {
-                myBoard.placePiece(bsp.getPiece().getImage(), bsp.getPiece().getSize(),
-                        bsp.getPiece().getID(), x, y);
-                bsp.nextShip();
+                if(myBoard.placePiece(bsp.getPiece().getImage(), bsp.getPiece().getSize(),
+                        bsp.getPiece().getID(), x, y))
+                    bsp.nextShip();
             }
 
             else {
@@ -262,7 +262,6 @@ class DrawCanvas extends Canvas
                 }
             }
         }
-
     }
     
     
