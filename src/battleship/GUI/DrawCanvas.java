@@ -26,6 +26,8 @@ class DrawCanvas extends Canvas
     private BufferedImage drawBuff;
     private BufferedImage menuBuff;
     private BufferedImage boardBuff;
+    private BufferedImage winBuff;
+    private BufferedImage loseBuff;
     private Graphics2D boardGraphics;
     private Graphics2D drawGraphics;
 
@@ -102,6 +104,9 @@ class DrawCanvas extends Canvas
         
         //the menu that will be used at the beginning
         menuBuff = ImageIO.read(new File("titlescreen.png"));
+        
+        winBuff = ImageIO.read(new File("win.png"));
+        loseBuff = ImageIO.read(new File("lose.png"));
     }
      
      //should really only ever be called once.
@@ -127,6 +132,8 @@ class DrawCanvas extends Canvas
         //Draw appropriate images
         if(turn == -1)
             menuState();
+        else if(turn < -2)
+            endState();
         else
             gameState();
 
@@ -184,9 +191,12 @@ class DrawCanvas extends Canvas
                     , 330, 450);
     }
     
-    public void endGameState()
+    public void endState()
     {
-        //Display the outcome of the game and wait until window is closed
+        if(turn == -2)
+            drawGraphics.drawImage(winBuff, 0, 0, null);
+        else
+            drawGraphics.drawImage(loseBuff, 0, 0, null);
         
     }
     /****************END DRAWING AND PAINTING**************************/
@@ -235,10 +245,15 @@ class DrawCanvas extends Canvas
         if(myBoard.hit(netMed.getMoveX(), netMed.getMoveY()) == true) {
             myBoard.placePiece(hitMarker, 0, netMed.getMoveX(), netMed.getMoveY());
             netMed.setHit(true);
+            if(myBoard.gameOver()) {
+                netMed.setWin(true);
+                turn = -3;
+            }
         }
         else {
             myBoard.placePiece(missMarker, 0, netMed.getMoveX(), netMed.getMoveY());
             netMed.setHit(false);
+            netMed.setWin(false);
         }
 
         //send the message
