@@ -184,6 +184,20 @@ class DrawCanvas extends Canvas
         oppBoard.render(drawGraphics, 550, 50);
         bsp.render(drawGraphics, x, y);
         
+        //drawing your ship information
+        drawGraphics.drawImage(bsp.getShipImage(0), 5, 55, null);
+        drawGraphics.drawString(Integer.toString(myBoard.shipsLeft(0)), 100, 75);
+        
+        drawGraphics.drawImage(bsp.getShipImage(1), 5, 95, null);
+        drawGraphics.drawString(Integer.toString(myBoard.shipsLeft(1)), 100, 115);
+        
+        //drawing enemy ship information
+        drawGraphics.drawImage(bsp.getShipImage(0), 850, 55, null);
+        drawGraphics.drawString(Integer.toString(oppBoard.shipsLeft(0)), 955, 75);
+        
+        drawGraphics.drawImage(bsp.getShipImage(1), 850, 95, null);
+        drawGraphics.drawString(Integer.toString(oppBoard.shipsLeft(1)), 955, 115);
+        
         //write the appropriate status
         if(bsp.shipsRemaining() && turn == 0)
             drawGraphics.drawString("Please place your ships on the board."
@@ -223,25 +237,27 @@ class DrawCanvas extends Canvas
             
             //This is just for placing the initial ships
             if(bsp.shipsRemaining()) {
-                myBoard.placePiece(bsp.getPiece().getImage(), bsp.getPiece().getSize(), x, y);
+                myBoard.placePiece(bsp.getPiece().getImage(), bsp.getPiece().getSize(),
+                        bsp.getPiece().getID(), x, y);
                 bsp.nextShip();
             }
 
             else {
                 //offsetting the calculation
                 x = x-13;
-                netMed.setMove(x, y);
+                netMed.setMove(x, y, 0);
                 netMed.send();
                 netMed.recieve();
 
-                if(netMed.hit() == true) {
-                    oppBoard.placePiece(hitMarker, 0, x, y);
+                if(netMed.getID() != 0) {
+                    oppBoard.placePiece(hitMarker, 0, 0, x, y);
                     needToUpdate = true;
                     if(netMed.win())
                         turn = -2;
+                    oppBoard.removeOne((netMed.getID()-1));
                 }
                 else {
-                    oppBoard.placePiece(missMarker, 0, x, y);
+                    oppBoard.placePiece(missMarker, 0, 0, x, y);
                     needToUpdate = true;
                 }
             }
@@ -255,9 +271,13 @@ class DrawCanvas extends Canvas
         netMed.recieve();
 
         //evaluate the message
-        if(myBoard.hit(netMed.getMoveX(), netMed.getMoveY()) == true) {
-            myBoard.placePiece(hitMarker, 0, netMed.getMoveX(), netMed.getMoveY());
+        int k = myBoard.hit(netMed.getMoveX(), netMed.getMoveY());
+        if(k != 0) {
+            myBoard.placePiece(hitMarker, 0, 0, netMed.getMoveX(), netMed.getMoveY());
             netMed.setHit(true);
+            netMed.setMove(0,0,k);
+            System.out.println(netMed.getID());
+            
             if(myBoard.gameOver()) {
                 netMed.setWin(true);
                 turn = -3;
@@ -266,9 +286,10 @@ class DrawCanvas extends Canvas
                 turn = 0;
         }
         else {
-            myBoard.placePiece(missMarker, 0, netMed.getMoveX(), netMed.getMoveY());
+            myBoard.placePiece(missMarker, 0, 0, netMed.getMoveX(), netMed.getMoveY());
             netMed.setHit(false);
             netMed.setWin(false);
+            netMed.setMove(0,0,0);
             turn = 0;
         }
 

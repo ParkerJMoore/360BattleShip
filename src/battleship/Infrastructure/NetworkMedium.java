@@ -31,9 +31,9 @@ public class NetworkMedium {
         msg = new CommMsg();
     }
     
-    public void setMove(int x, int y)
+    public void setMove(int x, int y, int id)
     {
-        msg = new CommMsg(x,y);
+        msg = new CommMsg(x,y,id);
     }
     
     public int getMoveX()
@@ -107,5 +107,9 @@ public class NetworkMedium {
         }
         
         return ip;
+    }
+
+    public int getID() {
+        return msg.getID();
     }
 }

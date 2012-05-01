@@ -38,10 +38,6 @@ public class MainWindowListener implements ActionListener {
     
     @Override
     public void actionPerformed(ActionEvent ae) {
-        
-        
-        
-        
         if(ae.getActionCommand().equals("Join"))
             setUpClient();
         else if(ae.getActionCommand().equals("Host")) {

@@ -16,11 +16,12 @@ import java.awt.image.BufferedImage;
  */
 public class Ship implements Renderable {
 
-    private int x, y, w, h, size;
+    private int x, y, w, h, size, id;
     BufferedImage shipImage;
     
     
-    public Ship(BufferedImage b, int ix, int iy, int iw, int ih, int s) {
+    public Ship(BufferedImage b, int iid, int ix, int iy, int iw, int ih, int s) {
+        id = iid;
         x = ix;
         y = iy;
         w = iw;
@@ -37,6 +38,11 @@ public class Ship implements Renderable {
     public int getSize()
     {
         return size;
+    }
+    
+    public int getID()
+    {
+        return id;
     }
     
     @Override

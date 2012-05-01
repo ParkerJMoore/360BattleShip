@@ -17,6 +17,7 @@ public class CommMsg implements Serializable {
     private int moveY;
     private int mouseX;
     private int mouseY;
+    private int shipID;
     private boolean hasGone;
     
     public CommMsg() {
@@ -24,13 +25,14 @@ public class CommMsg implements Serializable {
         moveX = moveY = mouseX = mouseY =  0;
     }
     
-    public CommMsg(int ix, int iy)
+    public CommMsg(int ix, int iy, int id)
     {
         hit = false;
         win = false;
         hasGone = false;
         moveX = ix;
         moveY = iy;
+        shipID = id;
     }
     
     public int getMoveX() {
@@ -89,5 +91,10 @@ public class CommMsg implements Serializable {
     public boolean win()
     {
         return win;
+    }
+    
+    public int getID()
+    {
+        return shipID;
     }
 }

@@ -6,6 +6,7 @@ package battleship.Infrastructure;
 
 import battleship.GUI.Renderable;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Scanner;
 import javax.imageio.ImageIO;
@@ -39,7 +40,7 @@ public class BattleShipPlacement implements Renderable {
         
         for(int i=0; i < maxSize+1; i++) {
             scan = new Scanner(br.readLine());
-            ships[i] = new Ship(ImageIO.read(new File(scan.next())), 
+            ships[i] = new Ship(ImageIO.read(new File(scan.next())), scan.nextInt(),
                     scan.nextInt(), scan.nextInt(), scan.nextInt(), 
                     scan.nextInt(), scan.nextInt());
         }
@@ -74,5 +75,10 @@ public class BattleShipPlacement implements Renderable {
         if(currentShip < maxSize)
             retVal = true;
         return retVal;
+    }
+    
+    public BufferedImage getShipImage(int i)
+    {
+        return ships[i].shipImage;
     }
 }
