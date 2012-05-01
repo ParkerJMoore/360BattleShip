@@ -38,7 +38,7 @@ public class BattleShipPlacement implements Renderable {
         
         maxSize = scan.nextInt();
         
-        for(int i=0; i < maxSize+1; i++) {
+        for(int i=0; i < maxSize + 1; i++) {
             scan = new Scanner(br.readLine());
             ships[i] = new Ship(ImageIO.read(new File(scan.next())), scan.nextInt(),
                     scan.nextInt(), scan.nextInt(), scan.nextInt(), 

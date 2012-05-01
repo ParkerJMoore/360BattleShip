@@ -24,7 +24,10 @@ public class MouseWatcher extends MouseAdapter {
     public void mousePressed(MouseEvent e)
     {
         try {
-            med.handleClick(e);
+            //if(e.getButton() == MouseEvent.BUTTON1)
+                med.handleClick(e);
+            //else
+                
         } catch (IOException ex) {
             Logger.getLogger(MouseWatcher.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {

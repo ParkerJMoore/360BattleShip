@@ -1,4 +1,7 @@
-2
+4
 ship1.png 1 0 0 90 30 3
 ship2.png 2 0 0 60 30 2
+ship3.png 3 0 0 90 30 3
+ship4.png 4 0 0 120 30 4
+ship5.png 5 0 0 150 30 5
 cursor.png 0 0 0 30 30 1
