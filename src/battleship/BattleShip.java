@@ -32,7 +32,7 @@ public class BattleShip {
         }
         
         //start up the window
-        MainWindow mw = new MainWindow("Super BattleBoats II");
+        MainWindow mw = new MainWindow("BattleBoats");
         mw.setIconImage(icon);
         mw.setVisible(true);
         

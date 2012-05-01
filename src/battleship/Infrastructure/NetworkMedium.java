@@ -4,9 +4,8 @@
  */
 package battleship.Infrastructure;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -85,5 +84,28 @@ public class NetworkMedium {
     public boolean win()
     {
         return msg.win();
+    }
+    
+    public String getIP(){
+        String ip = "";
+        
+        try{
+            URL url = new URL("http://automation.whatismyip.com/n09230945.asp");
+            Object content  = url.getContent();
+
+             if(content instanceof InputStream){
+                BufferedReader br = new BufferedReader(new InputStreamReader((InputStream) content));
+                ip = br.readLine();
+                br.close();
+            }
+            else{
+                ip = content.toString();
+            }
+        }
+        catch(Exception e){
+
+        }
+        
+        return ip;
     }
 }

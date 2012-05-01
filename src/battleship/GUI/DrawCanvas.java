@@ -151,6 +151,7 @@ class DrawCanvas extends Canvas
     {
         //draw all the menu stuff that we want
         drawGraphics.drawImage(menuBuff, 0, 0, null);
+        drawGraphics.drawString(netMed.getIP(), 5, 490);
     }
     
     public void gameState()
