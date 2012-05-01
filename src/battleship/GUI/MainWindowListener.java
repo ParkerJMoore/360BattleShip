@@ -39,10 +39,19 @@ public class MainWindowListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent ae) {
         
+        
+        
+        
         if(ae.getActionCommand().equals("Join"))
             setUpClient();
-        else if(ae.getActionCommand().equals("Host"))
+        else if(ae.getActionCommand().equals("Host")) {
+            mw.canvas.menuGraphics.drawString("Please wait while the connection"
+                    , 700, 475);
+            mw.canvas.menuGraphics.drawString("to the opponent is established.",
+                    700, 490);
+            mw.canvas.update(mw.getCanvas().getGraphics());
             setUpServer();
+        }
         else if(ae.getActionCommand().equals("Exit")){
             try
             {

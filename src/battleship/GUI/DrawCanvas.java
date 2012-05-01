@@ -23,13 +23,18 @@ class DrawCanvas extends Canvas
     
     private BufferedImage hitMarker;
     private BufferedImage missMarker;
+    
     private BufferedImage drawBuff;
+    private Graphics2D drawGraphics;
+    
     private BufferedImage menuBuff;
-    private BufferedImage boardBuff;
+    public  Graphics2D menuGraphics;
+    
     private BufferedImage winBuff;
     private BufferedImage loseBuff;
+
+    private BufferedImage boardBuff;
     private Graphics2D boardGraphics;
-    private Graphics2D drawGraphics;
 
     BattleShipPlacement bsp;
     
@@ -107,6 +112,11 @@ class DrawCanvas extends Canvas
         
         winBuff = ImageIO.read(new File("win.png"));
         loseBuff = ImageIO.read(new File("lose.png"));
+        
+        menuGraphics = menuBuff.createGraphics();
+        menuGraphics.setColor(Color.YELLOW);
+        menuGraphics.setBackground(new Color(0, 0, 0, 0));
+        menuGraphics.setFont(new Font("serif", Font.BOLD, 15));
     }
      
      //should really only ever be called once.
@@ -132,7 +142,7 @@ class DrawCanvas extends Canvas
         //Draw appropriate images
         if(turn == -1)
             menuState();
-        else if(turn < -2)
+        else if(turn <= -2)
             endState();
         else
             gameState();
@@ -227,6 +237,8 @@ class DrawCanvas extends Canvas
                 if(netMed.hit() == true) {
                     oppBoard.placePiece(hitMarker, 0, x, y);
                     needToUpdate = true;
+                    if(netMed.win())
+                        turn = -2;
                 }
                 else {
                     oppBoard.placePiece(missMarker, 0, x, y);
@@ -250,18 +262,18 @@ class DrawCanvas extends Canvas
                 netMed.setWin(true);
                 turn = -3;
             }
+            else 
+                turn = 0;
         }
         else {
             myBoard.placePiece(missMarker, 0, netMed.getMoveX(), netMed.getMoveY());
             netMed.setHit(false);
             netMed.setWin(false);
+            turn = 0;
         }
 
         //send the message
         netMed.send();
-        
-        //change the turn.
-        turn = 0;
     }
     /*********************END INTERPRETING INPUT AND NETWORK INTERACTION*****/
     
