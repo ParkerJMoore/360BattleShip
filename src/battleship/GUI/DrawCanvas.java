@@ -7,6 +7,10 @@ import battleship.Infrastructure.NetworkMedium;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
@@ -22,6 +26,8 @@ class DrawCanvas extends Canvas
     private BufferedImage drawBuff;
     private BufferedImage menuBuff;
     private BufferedImage boardBuff;
+    private BufferedImage winBuff;
+    private BufferedImage loseBuff;
     private Graphics2D boardGraphics;
     private Graphics2D drawGraphics;
 
@@ -39,6 +45,8 @@ class DrawCanvas extends Canvas
     ObjectInputStream in;
     int turn;
     
+    InetAddress ownIP;
+    
     MainWindowListener mwl;
     /***************INITIALIZATIONS*************/
     
@@ -46,6 +54,14 @@ class DrawCanvas extends Canvas
     /**************CONSTRUCTOR AND DEPENDENCIES************/
     public DrawCanvas(MainWindowListener m) throws IOException
     {
+        
+        //Get the hosts IP address
+        try {
+            ownIP = InetAddress.getLocalHost();
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(DrawCanvas.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         turn = -1;
         mwl = m;
 
@@ -75,16 +91,22 @@ class DrawCanvas extends Canvas
         drawGraphics = drawBuff.createGraphics();
         
         //setting up the draw graphics for drawing and writing
-        drawGraphics.setColor(Color.BLACK);
+        drawGraphics.setColor(Color.YELLOW);
         drawGraphics.setBackground(new Color(0, 0, 0, 0));
         drawGraphics.setFont(new Font("serif", Font.BOLD, 15));
         
         //the background image
         boardBuff = ImageIO.read(new File("battleBoard.png"));
         boardGraphics = boardBuff.createGraphics();
+        boardGraphics.setColor(Color.YELLOW);
+        boardGraphics.setBackground(new Color(0, 0, 0, 0));
+        boardGraphics.setFont(new Font("serif", Font.BOLD, 15));
         
         //the menu that will be used at the beginning
         menuBuff = ImageIO.read(new File("titlescreen.png"));
+        
+        winBuff = ImageIO.read(new File("win.png"));
+        loseBuff = ImageIO.read(new File("lose.png"));
     }
      
      //should really only ever be called once.
@@ -110,6 +132,8 @@ class DrawCanvas extends Canvas
         //Draw appropriate images
         if(turn == -1)
             menuState();
+        else if(turn < -2)
+            endState();
         else
             gameState();
 
@@ -137,27 +161,52 @@ class DrawCanvas extends Canvas
         
         if(turn == 1 && !bsp.shipsRemaining())
             waitForAndHandleMove();
-        
+
         if(needToUpdate) {
             needToUpdate = false;
             turn = 1;
         }
-            
+        
         //draw everything to the buffer
         drawGraphics.drawImage(boardBuff, 0, 0, null);
         myBoard.render(drawGraphics, 150, 50);
         oppBoard.render(drawGraphics, 550, 50);
         bsp.render(drawGraphics, x, y);
+        
+        //write the appropriate status
+        if(bsp.shipsRemaining() && turn == 0)
+            drawGraphics.drawString("Please place your ships on the board."
+                    , 349, 450);
+        else if(bsp.shipsRemaining() && turn == 1) {
+            drawGraphics.drawString("Please place your ships on the board and"
+                    , 349, 450);
+            drawGraphics.drawString("wait for opponent to make their first move."
+                    , 349, 465);
+        }
+        else if(turn == 0)
+            drawGraphics.drawString("Please make a move."
+                    , 416, 450);
+        else
+            drawGraphics.drawString("Waiting for opponent to make their move."
+                    , 330, 450);
+    }
+    
+    public void endState()
+    {
+        if(turn == -2)
+            drawGraphics.drawImage(winBuff, 0, 0, null);
+        else
+            drawGraphics.drawImage(loseBuff, 0, 0, null);
+        
     }
     /****************END DRAWING AND PAINTING**************************/
     
    
     /*********************INTERPRETING INPUT AND NETWORK INTERACTION**********/
     public void reactToClick() throws IOException, ClassNotFoundException {
-        if(turn == -1)
-            JOptionPane.showMessageDialog(null, "Please select Join/Select from"
-                    + " the Match menu before making a move.");
-        else {
+        if(turn != -1) 
+        {
+            //offset coordinates for players board
             int x = (calcX()/30)-5;
             int y = (calcY()/30)-1;
             
@@ -170,7 +219,6 @@ class DrawCanvas extends Canvas
             else {
                 //offsetting the calculation
                 x = x-13;
-                System.out.println("Sending X: " + x + " Y: " + y);
                 netMed.setMove(x, y);
                 netMed.send();
                 netMed.recieve();
@@ -197,11 +245,15 @@ class DrawCanvas extends Canvas
         if(myBoard.hit(netMed.getMoveX(), netMed.getMoveY()) == true) {
             myBoard.placePiece(hitMarker, 0, netMed.getMoveX(), netMed.getMoveY());
             netMed.setHit(true);
-            //netMed.
+            if(myBoard.gameOver()) {
+                netMed.setWin(true);
+                turn = -3;
+            }
         }
         else {
             myBoard.placePiece(missMarker, 0, netMed.getMoveX(), netMed.getMoveY());
             netMed.setHit(false);
+            netMed.setWin(false);
         }
 
         //send the message
