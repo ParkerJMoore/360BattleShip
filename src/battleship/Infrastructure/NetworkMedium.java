@@ -88,24 +88,24 @@ public class NetworkMedium {
     
     public String getIP(){
         String ip = "";
-        
         try{
             URL url = new URL("http://automation.whatismyip.com/n09230945.asp");
             Object content  = url.getContent();
 
-             if(content instanceof InputStream){
+            if(content instanceof InputStream){
                 BufferedReader br = new BufferedReader(new InputStreamReader((InputStream) content));
-                ip = br.readLine();
+                ip += br.readLine();
                 br.close();
-            }
-            else{
                 ip = content.toString();
-            }
+           }
+           else{
+               ip += content.toString();
+           }
         }
         catch(Exception e){
 
         }
-        
+
         return ip;
     }
 

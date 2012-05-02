@@ -34,6 +34,9 @@ class DrawCanvas extends Canvas
     
     private BufferedImage winBuff;
     private BufferedImage loseBuff;
+    
+    private BufferedImage zaneWins;
+    private BufferedImage euanWins;
 
     private BufferedImage boardBuff;
     private Graphics2D boardGraphics;
@@ -121,6 +124,9 @@ class DrawCanvas extends Canvas
         winBuff = ImageIO.read(new File("win.png"));
         loseBuff = ImageIO.read(new File("lose.png"));
         
+        zaneWins = ImageIO.read(new File("zanewins.png"));
+        euanWins = ImageIO.read(new File("euanwins.png")); 
+        
         menuGraphics = menuBuff.createGraphics();
         menuGraphics.setColor(Color.YELLOW);
         menuGraphics.setBackground(new Color(0, 0, 0, 0));
@@ -173,6 +179,7 @@ class DrawCanvas extends Canvas
         //draw all the menu stuff that we want
         drawGraphics.drawImage(menuBuff, 0, 0, null);
         drawGraphics.drawString(netMed.getIP(), 5, 490);
+        drawGraphics.drawString("A Game By Parker Moore and David Kerr", 700, 15);
     }
     
     public void gameState()
@@ -285,12 +292,31 @@ class DrawCanvas extends Canvas
     }
     
     public void endState()
-    {
+    {/*
         if(turn == -2)
             drawGraphics.drawImage(winBuff, 0, 0, null);
         else
             drawGraphics.drawImage(loseBuff, 0, 0, null);
+        */
         
+        if(turn == -2){
+            if(mwl.choice == 1) {
+                drawGraphics.drawImage(euanWins, 0, 0, null);
+            }
+            else{
+                drawGraphics.drawImage(zaneWins, 0, 0, null);
+            }
+            drawGraphics.drawString("You Win!", 445, 15);
+        }
+        else{
+            if(mwl.choice == 1) {
+                drawGraphics.drawImage(zaneWins, 0, 0, null);
+            }
+            else{
+                drawGraphics.drawImage(euanWins, 0, 0, null);
+            }
+            drawGraphics.drawString("You Lose!", 445, 15);
+        }
     }
     /****************END DRAWING AND PAINTING**************************/
     
